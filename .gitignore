@@ -1,0 +1,6 @@
+.nextflow/
+work/
+data/
+.nextflow.log*
+.DS_Store
+.vscode/
