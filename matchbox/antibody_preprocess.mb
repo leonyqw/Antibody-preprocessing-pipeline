@@ -20,7 +20,6 @@ if read matches [before:_ ATGAAAAAGACAGCTATCGCGATTGCAGTG after:_] => {
                                 light.out!('{seqid}_light.fasta')
                 }
           }
-
        	}
 }
 
@@ -44,7 +43,6 @@ if -read matches [before:_ ATGAAAAAGACAGCTATCGCGATTGCAGTG after:_] => {
                                 light.out!('{seqid}_light.fasta')
                         }
                 }
-
        	}
 }
 }

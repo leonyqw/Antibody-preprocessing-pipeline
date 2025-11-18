@@ -15,11 +15,18 @@ params {
 	read_files: String = "${projectDir}/data/*.fastq"
 	name: String = "SAMPLE_1"
 	phagemid_ref: Path = "${projectDir}/data/reference_files/fab_phagemid.fa"
+	matchbox_path: Path = "${projectDir}/matchbox/matchbox"
+	// matchbox_path=/vast/projects/antibody_sequencing/matchbox/target/release/matchbox
+	matchbox_antibody_preprocess_script: Path = "${projectDir}/matchbox/antibody_preprocess.mb"
+	// matchbox_script=/vast/projects/antibody_sequencing/PC008/antibody_preprocess.mb
+	// heavy_file: String = "${name}_heavy.fasta"
+	// light_file: String = "${name}_light.fasta"
 }
 
 // Import processes or subworkflows to be run in the workflow
 include { minimap2 } from './modules/minimap2'
 include { samtools } from './modules/samtools'
+include { matchbox } from './modules/matchbox'
 
 workflow {
 	// Create channel for the read files and reference genome file
@@ -34,6 +41,12 @@ workflow {
 	minimap2(read_files, ref, params.name)
 	samtools(minimap2.out.aligned_read, params.name)
 
+	// Extract with matchbox
+	matchbox(read_files, 
+				params.matchbox_path, 
+				params.matchbox_antibody_preprocess_script,
+				params.name)
+
     // publish:
     // samples = ch_samples
 }
@@ -44,16 +57,6 @@ workflow {
 //     }
 // }
 
-// ## DON'T CHANGE ANYTHING ELSE ##
-// # ref files, scripts etc
-// matchbox_path=/vast/projects/antibody_sequencing/matchbox/target/release/matchbox
-// matchbox_script=/vast/projects/antibody_sequencing/PC008/antibody_preprocess.mb
-// heavy_file="${name}_heavy.fasta"
-// light_file="${name}_light.fasta"
-
-
-// # extract with matchbox
-// $matchbox_path --script-file $matchbox_script -e 0.3 --args "seqid='${name}'" $read_file > "${name}_extract_stats.txt"
 
 // riot_na -f $heavy_file --species HOMO_SAPIENS -p 16 > "${name}_annot_heavy.csv"
 // riot_na -f $light_file --species HOMO_SAPIENS -p 16 > "${name}_annot_light.csv"
