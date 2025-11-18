@@ -28,11 +28,12 @@ process samtools {
 
     script:
     """
-	# View and convert file from SAM to BAM format
-	# Sort alignments and outputs the file in BAM format
+	# View and convert file from SAM to BAM format. Sort alignments and outputs the file in BAM format
 	samtools view -b "${aligned_read_file}" | samtools sort -o "${name}_aligned_sorted.bam"
+	
 	# Index BAM file for fast random access
 	samtools index "${name}_aligned_sorted.bam"
+	
 	# Counts the number of alignments for each FLAG type
 	samtools flagstat "${name}_aligned_sorted.bam" > "${name}_alignment_stats.txt"
     """
