@@ -26,16 +26,15 @@ process matchbox {
     Run matchbox script, output only heavy and light chain reads, and statistics
     -s  Execute the matchbox script
     -e  Include error tolerance of 0.3 (30%) for insertions, deletions and substitutions
-    -a  Set seqid argument as a string
+    -a  Set seqid argument as the sample name
+    --with-reverse-complement   Also process the reverse complement of the reads over the script
     */
     script:
     // ${matchbox_path} \\
     """
 	matchbox \\
     -s ${matchbox_script} -e 0.3 \\
-    -a "seqid='${sample_name}'" \\
+    -a "seqid='${sample_name}'" --with-reverse-complement\\
     ${read_file}
     """
 }
-//--with-reverse-complement
-//Remove text and use csv

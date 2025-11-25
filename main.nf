@@ -19,6 +19,7 @@ params {
 	// matchbox_path=/vast/projects/antibody_sequencing/matchbox/target/release/matchbox
 	matchbox_antibody_preprocess_script: Path = "${projectDir}/matchbox/antibody_preprocess.mb"
 	// matchbox_script=/vast/projects/antibody_sequencing/PC008/antibody_preprocess.mb
+	// output_path: Path = "${projectDir}/output/"
 }
 
 // Import processes or subworkflows to be run in the workflow
@@ -33,7 +34,6 @@ def get_name(file) {
 }
 
 workflow {
-
 	// Create channel for the read files and extract the barcode from file name as the sample name
 	files = channel.fromPath(params.read_files)
 	.map {
