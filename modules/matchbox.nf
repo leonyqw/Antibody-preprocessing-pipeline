@@ -10,7 +10,8 @@ process matchbox {
 
 	// Declare inputs required for the process
     input:
-    (read_file, sample_name): Tuple<Path, String> // Path for DNA sequence fastq files
+    // Tuple for sample name, and path for DNA sequence fastq files
+	(sample_name, read_file): Tuple<String, Path>
 	// matchbox_path: Path // Path to matchbox package
     matchbox_script: Path // Path to matchbox script
 	// sample_name: String // Sample name
@@ -18,9 +19,10 @@ process matchbox {
 	// Declare outputs
 	output:
 	matchbox_stats: Path = file("${sample_name}_count.csv")
-    heavy_file: Path = file("${sample_name}_heavy.fasta")
-    light_file: Path = file("${sample_name}_light.fasta")
-    sample_name: String = sample_name
+    // heavy_file: Path = file("${sample_name}_heavy.fasta")
+    // light_file: Path = file("${sample_name}_light.fasta")
+    // sample_name: String = sample_name
+    matchbox_files = tuple(sample_name, file("${sample_name}_heavy.fasta"), file("${sample_name}_light.fasta"))
 
     /*
     Run matchbox script, output only heavy and light chain reads, and statistics

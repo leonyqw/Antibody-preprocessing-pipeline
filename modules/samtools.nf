@@ -19,12 +19,13 @@ process samtools {
 
 	// Declare inputs required for the process
     input:
-	aligned_read_file: Path // Path for aligned reads after minimap2
-	sample_name: String // Sample name
+	// Tuple for sample name, and path for aligned reads after minimap2
+	(sample_name, aligned_read_file): Tuple<String, Path> 
 	
 	// Declare outputs
 	output:
 	aligned_sorted_read: Path = file("${sample_name}_aligned_sorted.bam")
+	index: Path = file("${sample_name}_aligned_sorted.bam.bai")
 
     script:
     """

@@ -1,6 +1,5 @@
 /*
-Utilize minimap2 to align Oxford Nanopore DNA read sequences contained in fastq files against a reference genome database.
-The aligned sequence is output as a SAM file.
+Utilize minimap2 to align Oxford Nanopore DNA read sequences contained in fastq files against a reference genome database. The aligned sequence is output as a SAM file.
 */
 
 //Enable typed processes
@@ -19,14 +18,14 @@ process minimap2 {
 	// container "oras://community.wave.seqera.io/library/minimap2:2.30--3bf3d6cb39a98dae"
 
     input:
-	(read_file, sample_name): Tuple<Path, String> // Path for DNA sequence fastq files
+	// Tuple for sample name, and path for DNA sequence fastq files
+	(sample_name, read_file): Tuple<String, Path>
 	reference: Path // Path for reference genome
-	// (file, sample_name): Tuple<Path, String>
-	// name: String // Sample name
 	
 	output:
-	aligned_read: Path = file("${sample_name}_aligned.sam")
-	sample_name: String = sample_name
+	// aligned_read: Path = file("${sample_name}_aligned.sam")
+	// sample_name: String = sample_name
+	minimap_out = tuple(sample_name, file("${sample_name}_aligned.sam"))
 
 	/*
 	Run minimap, mapping reads to a reference and outputs a sam file

@@ -4,3 +4,4 @@ data/
 .nextflow.log*
 .DS_Store
 .vscode/
+results/
