@@ -15,7 +15,7 @@ process minimap2 {
 	// container "community.wave.seqera.io/library/minimap2:2.30--dde6b0c5fbc82ebd"
 
 	// Singularity container for conda minimap2 (linux/amd64)
-	// container "oras://community.wave.seqera.io/library/minimap2:2.30--3bf3d6cb39a98dae"
+	container "oras://community.wave.seqera.io/library/minimap2:2.30--3bf3d6cb39a98dae"
 
     input:
 	// Tuple for sample name, and path for DNA sequence fastq files
