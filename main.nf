@@ -53,7 +53,7 @@ workflow {
 	// }
 
 	// Print pipeline information
-	// header()
+	header()
 
 	if ( params.help ) { 
 	// if ( params.help || params.input == false ) {   
