@@ -8,11 +8,13 @@ nextflow.preview.types = true
 process matchbox {
 	tag "${sample_name}"
 
+    // Use Singularity container or pull from Docker container for samtools (linux/amd64) if singularity profile is enabled
+	container 'ghcr.io/jakob-schuster/matchbox@sha256:774786ff07c5d9d16d1fb64d8329c9c2cf9fd0fe3d89856e2a2672133e0c3fae'
+
 	// Declare inputs required for the process
     input:
     // Tuple for sample name, and path for DNA sequence fastq files
 	(sample_name, read_file): Tuple<String, Path>
-	// matchbox_path: Path // Path to matchbox package
     matchbox_script: Path // Path to matchbox script
 	
 	// Declare outputs

@@ -9,6 +9,17 @@ nextflow.preview.types = true
 process riot {
 	tag "${sample_name}"
 
+    // riot-na version 4.0.6 in use
+    // Check your python version installed if container cannot be created. Required Python version >= 3.10
+
+    // // Enable conda and install riot if conda profile is set
+	// conda (params.enable_conda ? 'bioconda::riot-na=4.0.6' : null)
+
+	// // Use Singularity container or pull from Docker container for riot-na (linux/amd64) if singularity profile is enabled
+	// container "${ (workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container) ?
+    // 'oras://community.wave.seqera.io/library/pip_riot-na:2f1b1af645ebb445' :
+    // 'community.wave.seqera.io/library/pip_riot-na:39dc45a0992795a8' }"
+
 	// Declare inputs required for the process
     input:
     // Tuple for sample name, and paths for heavy chain and light chain files
