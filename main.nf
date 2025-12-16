@@ -1,9 +1,9 @@
 #!/usr/bin/env nextflow
 
-//Enable strict syntax
+// Enable strict syntax
 //export NXF_SYNTAX_PARSER=v2
 
-//Enable typed processes
+// Enable typed processes
 nextflow.preview.types = true
 
 // Pipeline parameters
@@ -17,6 +17,7 @@ params {
 
 // Import processes or subworkflows to be run in the workflow
 include { header } from './modules/header'
+include { helpMessage } from './modules/help'
 include { minimap2 } from './modules/minimap2'
 include { samtools } from './modules/samtools'
 include { matchbox } from './modules/matchbox'
@@ -25,25 +26,6 @@ include { riot } from './modules/riot'
 // Create function to get the barcode from the file name
 def get_name(file) {
     return (file.baseName =~ /barcode\d+/)[0]
-}
-
-// Help function 
-def helpMessage() {
-    log.info"""
-Usage:  nextflow run main.nf --read_files [input path of fastq files] \\
-		--phagemid_ref [reference genome] --matchbox_script [matchbox script]
-
-Required Arguments:
---read_files		: Specify full path of read file(s) location.
---phagemid_ref		: Specify location of the reference genome.
---matchbox_script	: Specify matchbox script.
-
-Optional Arguments:
---output_dir		: Where the output files will be written to (default: "$projectDir/results).
---enable_conda		: Specify whether to enable conda or not. 
--profile		: Specify the profile to run nextflow through.
-			  Options - [standard, wehi, conda, singularity, local] (default: standard).
-""".stripIndent()
 }
 
 // Function for parameter validation
@@ -56,19 +38,19 @@ def param_validation() {
 workflow {
 	main:
 
-	// // Validate correct version is used
-	// if( !nextflow.version.matches('>=25.10.2') ) {
-    // error "This workflow requires Nextflow version 23.10 or greater -- You are running version $nextflow.version"
-	// }
-
-	// Invoke help function if required
-	if ( params.help ) {
-	helpMessage()
-	exit 1
+	// Validate correct nextflow version is used
+	if( !nextflow.version.matches('>=25.10.0') ) {
+    error "This workflow requires Nextflow version 25.10 or greater -- You are running version $nextflow.version"
 	}
+
+	// Print message for conda which is currently unsupported
+	if( params.enable_conda ) {
+    error "Note: The use of conda is currently unsupported"
+	}
+
+	// Invoke help message if required
+	helpMessage()
 	
-	// If none of the above are a problem, then run the workflow
-	else {
 	// Print pipeline information
 	header()
 	
@@ -92,7 +74,7 @@ workflow {
 
 	// Annotate heavy and light chain sequences
 	riot_out = riot(matchbox_out.matchbox_files) 
-	}
+
 
 	// Publish outputs
     publish:

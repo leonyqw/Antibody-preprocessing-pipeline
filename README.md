@@ -19,7 +19,6 @@ Required Arguments:
 
 Optional Arguments:
 --output_dir        : Where the output files will be written to (default: "$projectDir/results).
---enable_conda		: Specify whether to enable conda or not. 
 -profile		    : Specify the profile to run nextflow through.
 			          Options - [standard, wehi, conda, singularity, local] (default: standard).
 ```
