@@ -1,5 +1,6 @@
 # Matchbox script to rearrange the read sequence so the variable light chain occurs at the start of the read sequence, and outputs the heavy and light chain separately
 
+# Parameters
 
 # Declare sequences from reference to use to extract HC and LC
 # Light chain before and after sequences
