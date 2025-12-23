@@ -17,6 +17,7 @@ params {
 
 // Import processes or subworkflows to be run in the workflow
 include { header } from './modules/header'
+// include { validate_params } from './modules/validate_params'
 include { helpMessage } from './modules/help'
 include { minimap2 } from './modules/minimap2'
 include { samtools } from './modules/samtools'
@@ -55,6 +56,9 @@ workflow {
 	header()
 	
 	// Validate parameters
+	// validate_params(params.read_files, "Read files")
+	// validate_params(params.phagemid_ref, "Reference genome")
+	// validate_params(params.matchbox_script, "Matchbox script")
 	param_validation()
 
 	// Create channel for the read files and extract the barcode from file name as the sample name
