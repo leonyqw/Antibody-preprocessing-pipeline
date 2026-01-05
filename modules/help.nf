@@ -17,7 +17,7 @@ Required Arguments:
 --matchbox_script	: Specify matchbox script.
 
 Optional Arguments:
---output_dir		: Where the output files will be written to (default: "$projectDir/results).
+--output_dir		: Where the output files will be written to (default: "$projectDir/results").
 -profile		: Specify the profile to run nextflow through.
 			  Options - [standard, wehi, conda, singularity, local] (default: standard).
 """.stripIndent()

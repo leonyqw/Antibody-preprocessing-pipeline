@@ -29,13 +29,6 @@ def get_name(file) {
     return (file.baseName =~ /barcode\d+/)[0]
 }
 
-// Function for parameter validation
-def param_validation() {
-	channel.fromPath(params.read_files, checkIfExists: true)
-	channel.fromPath(params.phagemid_ref, checkIfExists: true)
-	channel.fromPath(params.matchbox_script, checkIfExists: true)
-}
-
 workflow {
 	main:
 
@@ -56,8 +49,8 @@ workflow {
 	header()
 
 	// Validate parameters
-	validate_params(params.read_files, params.phagemid_ref, params.matchbox_script)
-	// param_validation()
+	paths_to_validate = [params.read_files, params.phagemid_ref, params.matchbox_script].join(",")
+    validate_params(paths_to_validate)
 
 	// Create channel for the read files and extract the barcode from file name as the sample name
 	files = channel.fromPath(params.read_files)
