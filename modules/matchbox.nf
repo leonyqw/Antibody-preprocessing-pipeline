@@ -48,8 +48,7 @@ workflow matchbox {
 	// Declare inputs required for the process
     take:
     // Tuple for sample name, and path for DNA sequence fastq files
-	// read_file: Channel<Tuple<String, Path>>
-    files: Channel<Tuple<String, Path>>
+    files: Tuple<String, Path>
     matchbox_script: Path // Path to matchbox script
     matchbox_parameters: Path
 
