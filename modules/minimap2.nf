@@ -7,6 +7,7 @@ nextflow.preview.types = true
 
 process minimap2 {
 	tag "${sample_name}"
+	label "process_high"
 
 	// Enable conda and install minimap2 if conda profile is set
 	conda (params.enable_conda ? 'bioconda::minimap2=2.30' : null)
