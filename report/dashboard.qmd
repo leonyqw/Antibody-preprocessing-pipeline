@@ -53,6 +53,22 @@ combined_aligned_stats <- combined_aligned_stats %>%
     filter(category %in% rows_required)
 ```
 
+## Row 
+```{r}
+#| content: valuebox
+#| title: "Spam per day"
+list(
+    icon = "file-earmark-medical",
+    color = "info",
+    value = combined_aligned_stats %>%
+        distinct(sample_id) %>%
+        summarise(n = n())
+)
+```
+
+```{r}
+
+```
 ## Row {.flow}
 
 ```{r}

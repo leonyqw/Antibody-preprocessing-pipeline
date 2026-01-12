@@ -68,8 +68,10 @@ combined_aligned_stats %>%
 ```{r}
 #| label: total-reads
 
-ggplot(data = filter(combined_aligned_stats, category == "total"), 
-aes(y = sample_id, x = QC_pass)) +
+ggplot(
+    data = filter(combined_aligned_stats, category == "total"),
+    aes(y = sample_id, x = QC_pass)
+) +
     geom_col()
 ```
 
