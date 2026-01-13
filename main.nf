@@ -24,6 +24,8 @@ include { minimap2 } from './modules/minimap2'
 include { samtools } from './modules/samtools'
 include { matchbox } from './modules/matchbox'
 include { riot } from './modules/riot'
+include { matchbox as matchbox2 } from './modules/matchbox'
+include { riot as riot2 } from './modules/riot'
 
 // Create function to get the barcode from the file name
 def get_name(file) {
@@ -65,11 +67,17 @@ workflow {
 	// Convert and index the SAM file format to BAM file format
 	sam_out = samtools(minimap_out)
 
-	// Extract heavy and light chain pairs from the reads, and output summary stats
-	matchbox_out = matchbox(files, params.matchbox_script, params.matchbox_parameters)
+	// Extract heavy and light chain pairs from the reads
+	// Match and output all
+	matchbox_out_all = matchbox(files, params.matchbox_script, 
+		params.matchbox_parameters, "all")
+	// Match and output only the best match
+	matchbox_out_best = matchbox2(files, params.matchbox_script, 
+		params.matchbox_parameters, "all-best")
 
 	// Annotate heavy and light chain sequences
-	riot_out = riot(matchbox_out.matchbox_files)
+	riot_out_best = riot(matchbox_out_best.matchbox_files)
+	riot_out_all = riot2(matchbox_out_all.matchbox_files)
 
 
 	// Publish outputs
@@ -77,10 +85,14 @@ workflow {
 	bam_file = sam_out.aligned_sorted_read
 	bam_index = sam_out.index
 	aligned_stats = sam_out.aligned_stats
-	matchbox_stats = matchbox_out.matchbox_stats
-	matchbox_files = matchbox_out.matchbox_files
-	annotated_hc = riot_out.annot_heavy
-	annotated_lc = riot_out.annot_light
+	matchbox_stats_best = matchbox_out_best.matchbox_stats
+	matchbox_files_best = matchbox_out_best.matchbox_files
+	matchbox_stats_all = matchbox_out_all.matchbox_stats
+	matchbox_files_all = matchbox_out_all.matchbox_files
+	annotated_hc_best = riot_out_best.annot_heavy
+	annotated_lc_best = riot_out_best.annot_light
+	annotated_hc_all = riot_out_all.annot_heavy
+	annotated_lc_all = riot_out_all.annot_light
 
 	// Completion message
 	onComplete:
@@ -107,24 +119,36 @@ workflow {
 // Set output paths
 output {
 	bam_file {
-        path "1. aligned reads"
+        path "1. aligned reads/bam files"
     }
 	bam_index {
-        path "1. aligned reads"
+        path "1. aligned reads/bam files"
     }
 	aligned_stats {
 		path "1. aligned reads/stats"
 	}
-	matchbox_stats {
-		path "2. extracted reads/counts"
+	matchbox_stats_best {
+		path "2. extracted reads/best/counts"
 	}
-	matchbox_files {
-		path "2. extracted reads"
+	matchbox_files_best {
+		path "2. extracted reads/best/fasta files"
 	}
-	annotated_hc {
-		path "3. annotated reads"
+	matchbox_stats_all {
+		path "2. extracted reads/all/counts"
 	}
-	annotated_lc {
-		path "3. annotated reads"
+	matchbox_files_all {
+		path "2. extracted reads/all/fasta files"
+	}
+	annotated_hc_best {
+		path "3. annotated reads/best"
+	}
+	annotated_lc_best {
+		path "3. annotated reads/best"
+	}
+	annotated_hc_all {
+		path "3. annotated reads/all"
+	}
+	annotated_lc_all {
+		path "3. annotated reads/best"
 	}
 }

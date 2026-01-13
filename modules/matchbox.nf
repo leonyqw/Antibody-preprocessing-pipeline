@@ -22,6 +22,7 @@ process run_matchbox {
     LC_after_kappa: String //Kappa light chain constant region sequence
     HCss: String //Heavy chain signal sequence
     HC_after: String //Sequence directly after variable heavy chain sequence
+    match_param: String
 
     output:
     matchbox_stats: Path = file("${sample_name}_count.csv")
@@ -40,6 +41,7 @@ process run_matchbox {
     -s ${matchbox_script} -e 0.3 \\
     -a "seqid='${sample_name}', LCss = ${LCss}, LC_after_lambda = ${LC_after_lambda}, LC_after_kappa = ${LC_after_kappa}, HCss = ${HCss}, HC_after = ${HC_after}" \\
     --with-reverse-complement \\
+    -m ${match_param}\\
     ${read_file}
     """
 }
@@ -52,6 +54,7 @@ workflow matchbox {
     files: Tuple<String, Path>
     matchbox_script: Path // Path to matchbox script
     matchbox_parameters: Path
+    match_param: String
 
     /*
     Run matchbox script, output only heavy and light chain reads, and statistics
@@ -67,7 +70,7 @@ workflow matchbox {
 
     matchbox_out = run_matchbox(files, matchbox_script, 
     parameters.LCss, parameters.LC_after_lambda, parameters.LC_after_kappa, 
-    parameters.HCss, parameters.HC_after)
+    parameters.HCss, parameters.HC_after, match_param)
 
 	// // Declare outputs
 	emit:
