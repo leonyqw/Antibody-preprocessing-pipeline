@@ -119,36 +119,36 @@ workflow {
 // Set output paths
 output {
 	bam_file {
-        path "1. aligned reads/bam files"
+        path "1_aligned_reads/bam_files"
     }
 	bam_index {
-        path "1. aligned reads/bam files"
+        path "1_aligned_reads/bam_files"
     }
 	aligned_stats {
-		path "1. aligned reads/stats"
+		path "1_aligned_reads/stats"
 	}
 	matchbox_stats_best {
-		path "2. extracted reads/best/counts"
+		path "2_extracted_reads/best/counts"
 	}
 	matchbox_files_best {
-		path "2. extracted reads/best/fasta files"
+		path "2_extracted_reads/best/fasta_files"
 	}
 	matchbox_stats_all {
-		path "2. extracted reads/all/counts"
+		path "2_extracted_reads/all/counts"
 	}
 	matchbox_files_all {
-		path "2. extracted reads/all/fasta files"
+		path "2_extracted_reads/all/fasta files"
 	}
 	annotated_hc_best {
-		path "3. annotated reads/best"
+		path "3_annotated_reads/best"
 	}
 	annotated_lc_best {
-		path "3. annotated reads/best"
+		path "3_annotated_reads/best"
 	}
 	annotated_hc_all {
-		path "3. annotated reads/all"
+		path "3_annotated_reads/all"
 	}
 	annotated_lc_all {
-		path "3. annotated reads/best"
+		path "3_annotated_reads/best"
 	}
 }
