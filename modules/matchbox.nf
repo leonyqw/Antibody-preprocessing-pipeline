@@ -50,8 +50,7 @@ workflow matchbox {
 
 	// Declare inputs required for the process
     take:
-    // Tuple for sample name, and path for DNA sequence fastq files
-    files: Tuple<String, Path>
+    files: Tuple<String, Path> // Tuple for sample name, and path for DNA sequence fastq files
     matchbox_script: Path // Path to matchbox script
     matchbox_parameters: Path
     match_param: String
