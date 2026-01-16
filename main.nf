@@ -56,13 +56,13 @@ workflow {
 
 	// Validate parameters
 	paths_to_validate = [params.read_dir, params.phagemid_ref, params.matchbox_script, params.matchbox_parameters].join(",")
-    validate_params(paths_to_validate)
+    // validate_params(paths_to_validate)
 
-	// Create channel for the read files and extract the barcode from file name as the sample name
-	files = channel.fromPath(params.read_dir)
-	.map {
-		file -> tuple(get_name(file), file)
-	}
+	// // Create channel for the read files and extract the barcode from file name as the sample name
+	// files = channel.fromPath(params.read_dir)
+	// .map {
+	// 	file -> tuple(get_name(file), file)
+	// }
 
 	sample = parse_sample_sheet(params.read_dir, params.sample_sheet, params.barcode_dir)
 
@@ -87,6 +87,7 @@ workflow {
 
 	// // Publish outputs
     // publish:
+	// concat_files = sample
 	// bam_file = sam_out.aligned_sorted_read
 	// bam_index = sam_out.index
 	// aligned_stats = sam_out.aligned_stats
