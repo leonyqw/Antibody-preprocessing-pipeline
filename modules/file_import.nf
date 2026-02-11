@@ -15,7 +15,7 @@ process concat_reads {
 
     // Output sample: tuple containing barcode and merged file
     output:
-    sample = tuple(barcode, file("${barcode}_merged.${extn}"))
+    sample = tuple(barcode, file("${barcode}_merged.fastq"))
 
     script:
     // Check if all files are the same format, or if files are not found
@@ -34,7 +34,7 @@ process concat_reads {
 
     // Append and join together files from the same barcode, and output a merged file
     """
-    zcat -f ${files.join(' ')} > "${barcode}_merged.${extn}"
+    zcat -f ${files.join(' ')} > "${barcode}_merged.fastq"
     """
 }
 
@@ -52,7 +52,9 @@ workflow parse_sample_sheet {
 
     // Get list of files for each barcode from the read directory, as well as any files in subdirectories that match
     barcode_files = barcodes
-    .map { barcode -> tuple(barcode, files("${read_dir}/**${barcode}*.{fastq, fq, fastq.gz, fq.gz}")) }
+    .map { barcode ->
+        tuple(barcode, files("${read_dir}/{*,**/*}${barcode}*.{fastq,fq,fastq.gz,fq.gz}"))
+    }
 
     // Read and concat (if multiple files) into one file per sample / barcode
     sample = concat_reads(barcode_files)

@@ -139,7 +139,7 @@ output {
 		path "3_extracted_reads/all/counts"
 	}
 	matchbox_files_all {
-		path "3_extracted_reads/all/fasta files"
+		path "3_extracted_reads/all/fasta_files"
 	}
 	annotated_hc_best {
 		path "4_annotated_reads/best"
