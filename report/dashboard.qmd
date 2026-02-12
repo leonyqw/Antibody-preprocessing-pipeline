@@ -117,7 +117,7 @@ vbs <- list(
     value_box(
         title = "Total barcodes",
         value = barcodes,
-        showcase = bs_icon("collection"),
+        showcase = bs_icon("justify"),
         theme = value_box_theme(bg = bg)
     ),
     value_box(
@@ -135,7 +135,7 @@ layout_column_wrap(
 )
 ```
 
-## Row {height=45%}
+## Row
 ```{r}
 #| title: "Sample alignment results and counts"
 
@@ -155,17 +155,32 @@ datatable(combined_aligned_stats_wide,
 ```
 
 ## Row
+
 ```{r}
+# Read in data
+#| include: false
 
-data <- mtcars
-data$carname <- row.names(data)
+# Get list of files
+files <- list.files(
+    path = "./results/2_aligned_reads/read_lengths",
+    pattern = "\\.tsv$",
+    full.names = TRUE
+)
 
-gg_point <- ggplot(data = data) +
-    geom_point_interactive(aes(
-        x = wt, y = qsec, color = disp,
-        tooltip = carname, data_id = carname
-    )) +
-    theme_minimal()
+# Read in files
+data_list <- lapply(files, fread, na.strings = c("N/A"))
+# Add in barcode from file name as id col
+names(data_list) <- str_replace(basename(files), "_read_lengths.tsv", "")
+
+# Combine datasets together and rename columns
+read_lengths_table <- rbindlist(data_list, idcol = "barcode", fill = TRUE)
+read_lengths_table <- rename(read_lengths_table,
+    "read_length" = V1
+)
+```
+```{r}
+ggplot(data = read_lengths_table, aes(x = barcode, y = log(read_length))) +
+geom_violin()
 
 girafe(ggobj = gg_point)
 ```
