@@ -1,5 +1,5 @@
 ---
-title: "Antibody Preprocessing"
+title: "Antibody Preprocessing Pipeline"
 author: "CBT & Ritchie Lab"
 date: today
 format: dashboard
@@ -20,6 +20,7 @@ library(formattable)
 library(DT)
 library(bsicons)
 library(bslib)
+library(scales)
 ```
 
 # Aligned Reads
@@ -48,6 +49,12 @@ combined_aligned_stats <- rename(combined_aligned_stats,
 ```
 
 ```{r}
+# Join in sample sheet information
+sample_sheet <- read_csv("./data/reference_files/sample_sheet.csv")
+sample_sheet <- sample_sheet %>% select(!report_group)
+```
+
+```{r}
 # Parse dataset
 
 # Rename and extract required rows
@@ -62,45 +69,10 @@ combined_aligned_stats <- combined_aligned_stats %>%
         as.numeric(QC_pass)
     )) %>%
     filter(category %in% rows_required)
-
-# Join in sample sheet information
-sample_sheet <- read_csv("./data/reference_files/sample_sheet.csv")
-```
-
-## Row 
-```{r}
-#| content: valuebox
-#| title: "Total samples"
-samples <- combined_aligned_stats %>%
-    distinct(barcode) %>%
-    summarise(n = n()) %>%
-    as.numeric()
-
-list(
-    icon = "file-earmark-medical",
-    color = "info",
-    value = samples
-)
 ```
 
 ```{r}
-#| content: valuebox
-#| title: "Total reads"
-total_reads <- sum(as.numeric(combined_aligned_stats$QC_pass[combined_aligned_stats$category == "total"]))
-
-list(
-    icon = "file-earmark",
-    color = "info",
-    value = total_reads
-)
-```
-
-## Row {.flow}
-
-```{r}
-#| title: "Aligned samples"
-
-# Make table
+# Pivot table
 combined_aligned_stats_wide <- combined_aligned_stats %>%
     pivot_wider(
         id_cols = barcode,
@@ -108,14 +80,82 @@ combined_aligned_stats_wide <- combined_aligned_stats %>%
         values_from = QC_pass
     )
 
-datatable(combined_aligned_stats_wide)
+# Join sample sheet information to aligned stats
+combined_aligned_stats_wide <- sample_sheet %>%
+left_join(combined_aligned_stats_wide, by = join_by(barcode)) %>% 
+relocate(sample_name) %>% 
+rename(mapped_perc = 'mapped %') %>% mutate(mapped_perc = percent(mapped_perc/100))
+```
+
+## Row {height=15%}
+```{r}
+# Get total samples number
+samples <- combined_aligned_stats_wide %>%
+    distinct(sample_name) %>%
+    summarise(n = n()) %>%
+    as.numeric()
+
+# Get total barcodes number
+barcodes <- combined_aligned_stats_wide %>%
+    distinct(barcode) %>%
+    summarise(n = n()) %>%
+    as.numeric()
+
+# Get total reads number
+total_reads <- sum(combined_aligned_stats_wide$total)
+
+bg = "#B4ECE7"
+
+# Create value boxes
+vbs <- list(
+    value_box(
+        title = "Total samples",
+        value = samples,
+        showcase = bs_icon("flask"),
+        theme = value_box_theme(bg = bg)
+    ),
+    value_box(
+        title = "Total barcodes",
+        value = barcodes,
+        showcase = bs_icon("collection"),
+        theme = value_box_theme(bg = bg)
+    ),
+    value_box(
+        title = "Total reads",
+        value = total_reads,
+        showcase = bs_icon("body-text"),
+        theme = value_box_theme(bg = bg)
+    )
+)
+
+# Display value boxes
+layout_column_wrap(
+    width = 1/3,
+    !!!vbs
+)
+```
+
+## Row {height=45%}
+```{r}
+#| title: "Sample alignment results and counts"
+
+datatable(combined_aligned_stats_wide,
+    filter = "top",
+    rownames = FALSE,
+    colnames = c("Sample name" = "sample_name", 
+    "Barcode" = "barcode",
+    "Species" = "species",
+    "Total reads" = "total",
+    "Primary read" = "primary",
+    "Secondary reads" = "secondary",
+    "Supplementary reads" = "supplementary",
+    "Mapped reads" = "mapped",
+    "Mapped reads %" = "mapped_perc")
+)
 ```
 
 ## Row
 ```{r}
-#| title: plot 1
-#| padding: 0px
-#| eval: false
 
 data <- mtcars
 data$carname <- row.names(data)
