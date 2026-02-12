@@ -84,6 +84,7 @@ workflow {
 	bam_file = sam_out.aligned_sorted_read
 	bam_index = sam_out.index
 	aligned_stats = sam_out.aligned_stats
+	read_lengths = sam_out.read_lengths
 	matchbox_stats_best = matchbox_out_best.matchbox_stats
 	matchbox_files_best = matchbox_out_best.matchbox_files
 	matchbox_stats_all = matchbox_out_all.matchbox_stats
@@ -128,6 +129,9 @@ output {
     }
 	aligned_stats {
 		path "2_aligned_reads/stats"
+	}
+	read_lengths {
+		path "2_aligned_reads/read_lengths"
 	}
 	matchbox_stats_best {
 		path "3_extracted_reads/best/counts"
