@@ -3,6 +3,7 @@ title: "Antibody Preprocessing Pipeline"
 author: "CBT & Ritchie Lab"
 date: today
 format: dashboard
+# server: shiny
 knitr:
     opts_knit:
         root.dir: '../'
@@ -14,13 +15,14 @@ library(tidyverse)
 library(vroom)
 library(data.table)
 library(ggplot2)
-library(ggiraph)
+# library(ggiraph)
 library(plotly)
 library(formattable)
 library(DT)
 library(bsicons)
 library(bslib)
 library(scales)
+# library(shiny)
 ```
 
 # Aligned Reads
@@ -46,10 +48,8 @@ combined_aligned_stats <- rbindlist(data_list, idcol = "barcode", fill = TRUE)
 combined_aligned_stats <- rename(combined_aligned_stats,
     "QC_pass" = V1, "QC_fail" = V2, "category" = V3
 )
-```
 
-```{r}
-# Join in sample sheet information
+# Read in sample sheet information
 sample_sheet <- read_csv("./data/reference_files/sample_sheet.csv")
 sample_sheet <- sample_sheet %>% select(!report_group)
 ```
@@ -87,7 +87,7 @@ relocate(sample_name) %>%
 rename(mapped_perc = 'mapped %') %>% mutate(mapped_perc = percent(mapped_perc/100))
 ```
 
-## Row {height=15%}
+## Row {height=150px}
 ```{r}
 # Get total samples number
 samples <- combined_aligned_stats_wide %>%
@@ -135,26 +135,34 @@ layout_column_wrap(
 )
 ```
 
-## Row
+## Row {.tabset}
 ```{r}
 #| title: "Sample alignment results and counts"
 
 datatable(combined_aligned_stats_wide,
     filter = "top",
     rownames = FALSE,
-    colnames = c("Sample name" = "sample_name", 
-    "Barcode" = "barcode",
-    "Species" = "species",
-    "Total reads" = "total",
-    "Primary read" = "primary",
-    "Secondary reads" = "secondary",
-    "Supplementary reads" = "supplementary",
-    "Mapped reads" = "mapped",
-    "Mapped reads %" = "mapped_perc")
+    colnames = c(
+        "Sample name" = "sample_name",
+        "Barcode" = "barcode",
+        "Species" = "species",
+        "Total reads" = "total",
+        "Primary read" = "primary",
+        "Secondary reads" = "secondary",
+        "Supplementary reads" = "supplementary",
+        "Mapped reads" = "mapped",
+        "Mapped reads %" = "mapped_perc"
+    ),
+    options = list(
+        autoWidth = TRUE,
+        initComplete = JS(
+            "function(settings, json) {",
+            "$(this.api().table().container()).css({'font-size': '12px'});",
+            "}"
+        )
+    )
 )
 ```
-
-## Row
 
 ```{r}
 # Read in data
@@ -178,31 +186,284 @@ read_lengths_table <- rename(read_lengths_table,
     "read_length" = V1
 )
 ```
-```{r}
-ggplot(data = read_lengths_table, aes(x = barcode, y = log(read_length))) +
-geom_violin()
 
-girafe(ggobj = gg_point)
+```{r}
+#| title: Read length distribution
+
+p1 <- ggplot(data = read_lengths_table) + 
+    geom_histogram(
+        aes(x = read_length, fill = barcode),
+        alpha = 0.7) + 
+    labs(x = "Read length", y = "Number of reads") + 
+    guides(fill = guide_legend(title = "Barcode")) + 
+    theme_bw()
+
+ggplotly(p1)
 ```
 
-::: {.card title="My Title"}
-This text will be displayed within a card
-:::
+```{r}
+#| title: Read length distribution (comparison)
+
+fig1 <- read_lengths_table %>%
+    plot_ly(
+        x = ~barcode,
+        y = ~ log(read_length),
+        split = ~barcode,
+        type = "violin"
+    )
+
+fig1 <- fig1 %>%
+    layout(
+        xaxis = list(
+            title = "Barcode"
+        ),
+        yaxis = list(
+            title = "Log read length",
+            zeroline = F
+        )
+    )
+
+fig1
+```
 
 # Extracted reads
 
-## Row {.fill}
+```{r}
+# Read in data
+#| include: false
 
-```{R}
-#| title: Plot 2
+# Get list of files
+files_extracted_reads <- list.files(
+    path = "./results/3_extracted_reads/best/counts",
+    pattern = "\\.csv$",
+    full.names = TRUE
+)
 
+# Read in files
+data_list_extracted_reads <- lapply(files_extracted_reads, fread, na.strings = c("N/A"))
+# Add in barcode from file name as id col
+names(data_list_extracted_reads) <- str_replace(basename(files_extracted_reads), "_count.csv", "")
+
+# Combine datasets together and rename columns
+extracted_reads_best <- rbindlist(data_list_extracted_reads, 
+idcol = "barcode", fill = TRUE)
+extracted_reads_best <- rename(extracted_reads_best, "sequence" = value)
+
+# Divide total reads by 2 (as duplicated when using reverse complement in matchbox)
+extracted_reads_best <- extracted_reads_best %>%
+    mutate(count = ifelse(sequence == "total reads", count / 2, count))
+
+# Join sample sheet information to aligned stats
+extracted_reads_best <- sample_sheet %>%
+left_join(extracted_reads_best, by = join_by(barcode)) %>% 
+relocate(sample_name)
 ```
 
-```{R}
-#| title: Plot 3
+## Row {height=150px}
+```{r}
+# Get total reads
+total_reads <- extracted_reads_best %>%
+    filter(sequence == "total reads") %>%
+    summarise(sum(count))
 
+# # Get total rotated reads
+# rotated_reads <- extracted_reads_best %>%
+#     filter(sequence == "rotated") %>%
+#     summarise(sum(count))
+
+# Get total heavy chains
+heavy_reads <- extracted_reads_best %>%
+    filter(sequence == "heavy") %>%
+    summarise(sum(count))
+
+# Get total heavy chains
+heavy_lambda_reads <- extracted_reads_best %>%
+    filter(sequence == "heavy + lambda") %>%
+    summarise(sum(count))
+
+# Get total heavy chains
+heavy_kappa_reads <- extracted_reads_best %>%
+    filter(sequence == "heavy + kappa") %>%
+    summarise(sum(count))
+
+heavy_light_reads <- heavy_lambda_reads + heavy_kappa_reads
+
+bg <- "#B4ECE7"
+
+# Create value boxes
+vbs2 <- list(
+    value_box(
+        title = "Total reads",
+        value = total_reads,
+        showcase = bs_icon("body-text"),
+        theme = value_box_theme(bg = bg)
+    ),
+    value_box(
+        title = "Total heavy chains",
+        value = heavy_reads,
+        showcase = bs_icon("h-square"),
+        theme = value_box_theme(bg = bg)
+    ),
+    # value_box(
+    #     title = "Total heavy + lambda chains",
+    #     value = heavy_lambda_reads,
+    #     showcase = bs_icon("plus-circle"),
+    #     theme = value_box_theme(bg = bg)
+    # ),
+    # value_box(
+    #     title = "Total heavy + kappa chains",
+    #     value = heavy_kappa_reads,
+    #     showcase = bs_icon("plus-square"),
+    #     theme = value_box_theme(bg = bg)
+    # )
+    value_box(
+        title = "Total heavy + light chains",
+        value = heavy_light_reads,
+        showcase = bs_icon("segmented-nav"),
+        theme = value_box_theme(bg = bg)
+    )
+)
+
+# Display value boxes
+layout_column_wrap(
+    width = 1 / 3,
+    !!!vbs2
+)
 ```
+
+## Row {.tabset}
+```{r}
+#| title: "Extracted reads summary"
+
+# Pivot extracted reads dataset to wide format
+extracted_reads_best_wide <- extracted_reads_best %>%
+    pivot_wider(names_from = sequence, values_from = count) %>% 
+    relocate('rotated', .after = species) %>% 
+    relocate('total reads', .after = species)
+
+# Output table
+datatable(extracted_reads_best_wide,
+    filter = "top",
+    rownames = FALSE,
+    colnames = c(
+        "Barcode" = "barcode",
+        "Total reads" = "total reads",
+        "Rotated reads" = "rotated",
+        "Heavy chains" = "heavy",
+        "Heavy + light (lambda) chains" = "heavy + lambda",
+        "Heavy + light (kappa) chains" = "heavy + kappa"
+    ),
+    options = list(
+        autoWidth = TRUE,
+        initComplete = JS(
+            "function(settings, json) {",
+            "$(this.api().table().container()).css({'font-size': '12px'});",
+            "}"
+        )
+    )
+)
+```
+
+```{r}
+#| title: Extracted read sequences per barcode
+
+# Plot sequence counts as fills on each column
+p2 <- extracted_reads_best %>%
+
+    ggplot(aes(fill = sequence)) + 
+    
+    geom_col(
+        data = extracted_reads_best[(extracted_reads_best[, "sequence"] == "total reads"), ],
+        aes(y = fct_reorder(barcode, count), x = count),
+    ) + 
+
+    geom_col(
+        data = extracted_reads_best[(extracted_reads_best[, "sequence"] == "rotated"), ],
+        aes(y = fct_reorder(barcode, count), x = count),
+    ) +
+
+    geom_col(
+        data = extracted_reads_best[(extracted_reads_best[, "sequence"] == "heavy"), ],
+        aes(y = fct_reorder(barcode, count), x = count)
+    ) +
+    
+    geom_col(
+        data = extracted_reads_best[(extracted_reads_best[, "sequence"] == "heavy + kappa" | extracted_reads_best[, "sequence"] == "heavy + lambda"), ],
+        aes(y = fct_reorder(barcode, count), x = count)
+    )
+
+p2 <- p2 + labs(x = "Number of sequences", y = "Barcode") +
+    theme_bw() +
+    scale_fill_manual(
+        values = c(
+            "total reads" = "#CAEEEC",
+            "rotated" = "#E5CFC2",
+            "heavy" = "#CBEDB1",
+            "heavy + kappa" = "#F8BAC9",
+            "heavy + lambda" = "#FFCBAE"
+        ),
+        # breaks = c("total reads", "rotated", "heavy", "heavy + kappa", "heavy + lambda"),
+        # labels = c("Total reads", "Rotated reads", "Heavy chains", "Heavy + light (kappa) chains", "Heavy + light (lambda) chains"),
+        name = "Sequence"
+    )
+
+ggplotly(p2)
+```
+
+```{r}
+#| title: Proportion of extracted read sequences per barcode
+
+# Create new data frame for proportions
+extracted_reads_best_prop <- extracted_reads_best %>%
+    group_by(barcode) %>%
+    mutate(prop = count / count[sequence == "total reads"]) %>%
+    ungroup()
+
+# Calculate correct proportions in relation to total sequences
+extracted_reads_best_prop <- extracted_reads_best_prop %>%
+    mutate(sequence = case_when(
+        sequence %in% c("heavy + kappa", "heavy + lambda") ~ "heavy + light",
+        .default = sequence
+    )) %>%
+    group_by(barcode, sequence) %>%
+    summarise(prop = sum(prop)) %>%
+    ungroup() %>%
+    mutate(sequence = ordered(sequence, 
+        levels = c("total reads", "rotated", "heavy", "heavy + light"))) %>%
+    group_by(barcode) %>%
+    arrange(barcode, desc(sequence)) %>%
+    mutate(diff = prop - lag(prop, default = first(prop))) %>%
+    ungroup() %>%
+    select(-prop) %>%
+    right_join(extracted_reads_best_prop, by = join_by(barcode, sequence)) %>%
+    mutate(diff = ifelse(is.na(diff), prop, diff)) %>%
+    mutate(sequence = factor(sequence, 
+    levels = c("total reads", "rotated", "heavy", "heavy + kappa", "heavy + lambda")))
+
+# Plot proportion of sequences extracted through matchbox
+p3 <- extracted_reads_best_prop %>%
+    ggplot() +
+    geom_col(
+        aes(y = fct_reorder(barcode, count), x = diff, fill = sequence),
+        position = "stack"
+    ) +
+    guides(fill = guide_legend(reverse = TRUE)) +
+    scale_fill_manual(values = c(
+        "total reads" = "#CAEEEC",
+        "rotated" = "#E5CFC2",
+        "heavy" = "#CBEDB1",
+        "heavy + kappa" = "#F8BAC9",
+        "heavy + lambda" = "#FFCBAE"
+    )) +
+    labs(x = "Proportion of sequences", y = "Barcode", fill = "Sequence") +
+    theme_bw()
+
+ggplotly(p3)
+```
+
 
 # Annotated reads
 
-## Row {.fill}
+<!-- ::: {.card title="My Title"}
+This text will be displayed within a card
+::: -->
