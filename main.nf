@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
-// Enable strict syntax
+// If you receive "ERROR ~ Script compilation error", make sure you have enabled strict syntax below. 
+// From nextflow version 26.04.0 onwards, this should be enabled by default.
 //export NXF_SYNTAX_PARSER=v2
 
 // Enable typed processes

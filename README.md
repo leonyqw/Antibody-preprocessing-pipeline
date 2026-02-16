@@ -6,6 +6,12 @@ This nextflow pipeline is designed to assist in processing of antibody long-read
 * The [data]()
 
 ## Usage
+NOTE: This pipeline requires strict syntax enabled (from nextflow version 26.04.0 onwards, this should be enabled by default). If this is not enabled, you may receive the following error: "ERROR ~ Script compilation error". If you receive this error, make sure you enable strict syntax in your terminal as follows:
+```
+export NXF_SYNTAX_PARSER=v2
+```
+
+
 ```
 Usage:  nextflow run main.nf --read_dir [path to fastq files] --sample_sheet [path to sample sheet] \\
 		--phagemid_ref [path to reference genome] --matchbox_script [path to matchbox script]
