@@ -87,7 +87,7 @@ relocate(sample_name) %>%
 rename(mapped_perc = 'mapped %') %>% mutate(mapped_perc = percent(mapped_perc/100))
 ```
 
-## Row {height=150px}
+## Row {height=120px}
 ```{r}
 # Get total samples number
 samples <- combined_aligned_stats_wide %>%
@@ -259,7 +259,7 @@ left_join(extracted_reads_best, by = join_by(barcode)) %>%
 relocate(sample_name)
 ```
 
-## Row {height=150px}
+## Row {height=120px}
 ```{r}
 # Get total reads
 total_reads <- extracted_reads_best %>%
