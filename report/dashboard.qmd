@@ -15,7 +15,7 @@ library(tidyverse)
 library(vroom)
 library(data.table)
 library(ggplot2)
-# library(ggiraph)
+library(ggiraph)
 library(plotly)
 library(formattable)
 library(DT)
@@ -25,7 +25,7 @@ library(scales)
 # library(shiny)
 ```
 
-# Aligned Reads
+# Aligned reads
 
 ```{r}
 # Read in data
@@ -86,6 +86,30 @@ left_join(combined_aligned_stats_wide, by = join_by(barcode)) %>%
 relocate(sample_name) %>% 
 rename(mapped_perc = 'mapped %') %>% mutate(mapped_perc = percent(mapped_perc/100))
 ```
+
+```{r}
+# Read in read length data
+#| include: false
+
+# Get list of files
+files <- list.files(
+    path = "./results/2_aligned_reads/read_lengths",
+    pattern = "\\.tsv$",
+    full.names = TRUE
+)
+
+# Read in files
+data_list <- lapply(files, fread, na.strings = c("N/A"))
+# Add in barcode from file name as id col
+names(data_list) <- str_replace(basename(files), "_read_lengths.tsv", "")
+
+# Combine datasets together and rename columns
+read_lengths_table <- rbindlist(data_list, idcol = "barcode", fill = TRUE)
+read_lengths_table <- rename(read_lengths_table,
+    "read_length" = V1
+)
+```
+## Row {height=120px}
 
 ## Row {height=120px}
 ```{r}
@@ -165,40 +189,34 @@ datatable(combined_aligned_stats_wide,
 ```
 
 ```{r}
-# Read in data
-#| include: false
-
-# Get list of files
-files <- list.files(
-    path = "./results/2_aligned_reads/read_lengths",
-    pattern = "\\.tsv$",
-    full.names = TRUE
-)
-
-# Read in files
-data_list <- lapply(files, fread, na.strings = c("N/A"))
-# Add in barcode from file name as id col
-names(data_list) <- str_replace(basename(files), "_read_lengths.tsv", "")
-
-# Combine datasets together and rename columns
-read_lengths_table <- rbindlist(data_list, idcol = "barcode", fill = TRUE)
-read_lengths_table <- rename(read_lengths_table,
-    "read_length" = V1
-)
-```
-
-```{r}
 #| title: Read length distribution
 
-p1 <- ggplot(data = read_lengths_table) + 
-    geom_histogram(
-        aes(x = read_length, fill = barcode),
-        alpha = 0.7) + 
-    labs(x = "Read length", y = "Number of reads") + 
-    guides(fill = guide_legend(title = "Barcode")) + 
+n_breaks = 30
+
+p1 <- ggplot(data = read_lengths_table, 
+        aes(x = read_length, fill = barcode, 
+            text = paste0("Count: ", after_stat(count),
+                "<br>Barcode: ", fill)),
+        # alpha = 0.7
+    ) +
+    geom_histogram() + 
+    scale_x_continuous(breaks = seq(0, max(read_lengths_table$read_length), 1000)) +
+    labs(x = "Read length", y = "Number of reads") +
+    guides(fill = guide_legend(title = "Barcode")) +
     theme_bw()
 
-ggplotly(p1)
+ggplotly(p1, tooltip = "text")
+
+# p1 <- ggplot(data = read_lengths_table) +
+#     geom_histogram_interactive(
+#         aes(x = read_length, fill = barcode, tooltip = barcode),
+#         alpha = 0.7
+#     ) +
+#     labs(x = "Read length", y = "Number of reads") +
+#     guides(fill = guide_legend(title = "Barcode")) +
+#     theme_bw()
+
+# girafe(ggobj = p1, width_svg = 50)
 ```
 
 ```{r}
@@ -367,7 +385,7 @@ datatable(extracted_reads_best_wide,
 ```{r}
 #| title: Extracted read sequences per barcode
 
-# Plot sequence counts as fills on each column
+# Plot sequence counts as fills on each barcode
 p2 <- extracted_reads_best %>%
 
     ggplot(aes(fill = sequence)) + 
@@ -407,6 +425,7 @@ p2 <- p2 + labs(x = "Number of sequences", y = "Barcode") +
         name = "Sequence"
     )
 
+# Output plot
 ggplotly(p2)
 ```
 
@@ -458,6 +477,7 @@ p3 <- extracted_reads_best_prop %>%
     labs(x = "Proportion of sequences", y = "Barcode", fill = "Sequence") +
     theme_bw()
 
+# Output plot
 ggplotly(p3)
 ```
 
