@@ -82,13 +82,16 @@ combined_aligned_stats_wide <- combined_aligned_stats %>%
 
 # Join sample sheet information to aligned stats
 combined_aligned_stats_wide <- sample_sheet %>%
-left_join(combined_aligned_stats_wide, by = join_by(barcode)) %>% 
-relocate(sample_name) %>% 
-rename(mapped_perc = 'mapped %') %>% mutate(mapped_perc = percent(mapped_perc/100))
+    left_join(combined_aligned_stats_wide, by = join_by(barcode)) %>%
+    relocate(sample_name) %>%
+    rename(mapped_perc = "mapped %") %>%
+    mutate(mapped_perc = percent(mapped_perc / 100,
+        accuracy = 1
+    ))
 ```
 
 ```{r}
-# Read in read length data
+# Read in data
 #| include: false
 
 # Get list of files
@@ -109,7 +112,6 @@ read_lengths_table <- rename(read_lengths_table,
     "read_length" = V1
 )
 ```
-## Row {height=120px}
 
 ## Row {height=120px}
 ```{r}
@@ -167,7 +169,7 @@ datatable(combined_aligned_stats_wide,
     filter = "top",
     rownames = FALSE,
     colnames = c(
-        "Sample name" = "sample_name",
+        "Sample" = "sample_name",
         "Barcode" = "barcode",
         "Species" = "species",
         "Total reads" = "total",
@@ -196,14 +198,17 @@ n_breaks = 30
 p1 <- ggplot(data = read_lengths_table, 
         aes(x = read_length, fill = barcode, 
             text = paste0("Count: ", after_stat(count),
-                "<br>Barcode: ", fill)),
-        # alpha = 0.7
+                "<br>", fill)),
     ) +
-    geom_histogram() + 
+    geom_histogram(alpha = 0.7, boundary = 0, binwidth = 100) + 
     scale_x_continuous(breaks = seq(0, max(read_lengths_table$read_length), 1000)) +
+    # scale_x_continuous(breaks = seq(0, max(read_lengths_table$read_length), 1000), 
+    # expand = c(0, 0)) +
+    # scale_y_continuous(expand = c(0, 0)) + 
     labs(x = "Read length", y = "Number of reads") +
     guides(fill = guide_legend(title = "Barcode")) +
-    theme_bw()
+    theme_classic() +
+    theme(panel.grid.major.y = element_line(color = "gray90", linewidth = 0.5))
 
 ggplotly(p1, tooltip = "text")
 
@@ -356,20 +361,28 @@ layout_column_wrap(
 # Pivot extracted reads dataset to wide format
 extracted_reads_best_wide <- extracted_reads_best %>%
     pivot_wider(names_from = sequence, values_from = count) %>% 
+    rename("heavy_kappa" = "heavy + kappa",
+    "heavy_lambda" = "heavy + lambda",
+    "total_reads" = "total reads"
+    ) %>%
     relocate('rotated', .after = species) %>% 
-    relocate('total reads', .after = species)
+    relocate('total_reads', .after = species) %>% 
+    mutate(recovery = percent((heavy_kappa + heavy_lambda)/total_reads, accuracy = 1))
 
 # Output table
 datatable(extracted_reads_best_wide,
     filter = "top",
     rownames = FALSE,
     colnames = c(
+        "Sample" = "sample_name",
         "Barcode" = "barcode",
-        "Total reads" = "total reads",
+        "Species" = "species",
+        "Total reads" = "total_reads",
         "Rotated reads" = "rotated",
         "Heavy chains" = "heavy",
-        "Heavy + light (lambda) chains" = "heavy + lambda",
-        "Heavy + light (kappa) chains" = "heavy + kappa"
+        "Heavy + light (lambda) chains" = "heavy_lambda",
+        "Heavy + light (kappa) chains" = "heavy_kappa",
+        "Recovery %" = "recovery"
     ),
     options = list(
         autoWidth = TRUE,
@@ -411,7 +424,7 @@ p2 <- extracted_reads_best %>%
     )
 
 p2 <- p2 + labs(x = "Number of sequences", y = "Barcode") +
-    theme_bw() +
+    theme_classic() +
     scale_fill_manual(
         values = c(
             "total reads" = "#CAEEEC",
@@ -475,7 +488,7 @@ p3 <- extracted_reads_best_prop %>%
         "heavy + lambda" = "#FFCBAE"
     )) +
     labs(x = "Proportion of sequences", y = "Barcode", fill = "Sequence") +
-    theme_bw()
+    theme_classic()
 
 # Output plot
 ggplotly(p3)
@@ -483,6 +496,65 @@ ggplotly(p3)
 
 
 # Annotated reads
+
+```{r}
+# Read in data
+#| include: false
+
+# Get list of files
+files_annot_reads <- list.files(
+    path = "./results/4_annotated_reads/best",
+    pattern = "\\.csv$",
+    full.names = TRUE
+)
+
+# Read in files
+data_list_annot_reads <- lapply(files_annot_reads, fread, na.strings = c("N/A"))
+# Add in barcode from file name as id col
+names(data_list_annot_reads) <- str_replace(basename(files_annot_reads), "_annot_(heavy|light).csv", "")
+
+# Combine datasets together and rename columns
+annot_reads_best <- rbindlist(data_list_annot_reads, 
+idcol = "barcode", fill = TRUE) %>% 
+select(barcode, productive)
+
+# Join sample sheet information to annotated stats
+annot_reads_best <- sample_sheet %>%
+left_join(annot_reads_best, by = join_by(barcode)) %>% 
+relocate(sample_name)
+```
+
+```{r}
+#| include: false
+
+# Get data on productive reads
+productive_df <- annot_reads_best %>% 
+group_by(barcode, productive) %>%
+summarise(count = n()) %>% 
+mutate(prop = count/sum(count)) %>%
+filter(productive == TRUE)
+```
+
+```{r}
+#| title: Read productivity
+
+# Get data on productive reads
+productive_df <- annot_reads_best %>% 
+group_by(barcode, productive) %>%
+summarise(count = n()) %>% 
+mutate(prop = count/sum(count)) %>%
+filter(productive == TRUE)
+
+# Plot proportion of productive reads
+p4 <- ggplot(data = productive_df, aes(x = prop, y = fct_rev(barcode))) + 
+geom_col(fill = "#E5CFC2") + 
+scale_x_continuous(limits = c(0,1)) +
+theme_classic() +
+labs(y = "Barcode", x = "Proportion")
+
+# Output plot
+ggplotly(p4)
+```
 
 <!-- ::: {.card title="My Title"}
 This text will be displayed within a card
