@@ -19,18 +19,9 @@ process concat_reads {
 
     script:
     // Check if all files are the same format, or if files are not found
-    if( files.size() == 0 )
+    if( files.size() == 0 ) {
         error "No files found for ${barcode}"
-    else if( files.every { format1 -> format1.name.endsWith('.fastq.gz') } )
-        extn = 'fastq.gz'
-    else if( files.every { format2 -> format2.name.endsWith('.fastq') } )
-        extn = 'fastq'
-    else if( files.every { format3 -> format3.name.endsWith('.fq.gz') } )
-        extn = 'fq.gz'
-    else if( files.every { format4 -> format4.name.endsWith('.fq') } )
-        extn = 'fq'
-    else
-        error "Concatentation of mixed filetypes is unsupported"
+        }
 
     // Append and join together files from the same barcode, and output a merged file
     """
@@ -53,7 +44,7 @@ workflow parse_sample_sheet {
     // Get list of files for each barcode from the read directory, as well as any files in subdirectories that match
     barcode_files = barcodes
     .map { barcode ->
-        tuple(barcode, files("${read_dir}/{*,**/*}${barcode}*.{fastq,fq,fastq.gz,fq.gz}"))
+        tuple(barcode, files("${read_dir}/**${barcode}*.{fastq,fq,fastq.gz,fq.gz}"))
     }
 
     // Read and concat (if multiple files) into one file per sample / barcode
