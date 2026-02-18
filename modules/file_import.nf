@@ -22,16 +22,6 @@ process concat_reads {
     if( files.size() == 0 ) {
         error "No files found for ${barcode}"
         }
-    // else if( files.every { format1 -> format1.name.endsWith('.fastq.gz') } )
-    //     extn = 'fastq.gz'
-    // else if( files.every { format2 -> format2.name.endsWith('.fastq') } )
-    //     extn = 'fastq'
-    // else if( files.every { format3 -> format3.name.endsWith('.fq.gz') } )
-    //     extn = 'fq.gz'
-    // else if( files.every { format4 -> format4.name.endsWith('.fq') } )
-    //     extn = 'fq'
-    // else
-    //     error "Concatentation of mixed filetypes is unsupported"
 
     // Append and join together files from the same barcode, and output a merged file
     """
