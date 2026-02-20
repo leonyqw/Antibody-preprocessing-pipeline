@@ -208,7 +208,7 @@ datatable(combined_aligned_stats_wide,
 #| title: Read length distribution
 
 # Create histogram of read lengths
-p1 <- ggplot(
+fig1 <- ggplot(
     data = read_lengths_table,
     aes(
         x = read_length, fill = barcode,
@@ -226,7 +226,7 @@ p1 <- ggplot(
     theme(panel.grid.major.y = element_line(color = "gray90", linewidth = 0.5))
 
 # Output interactive plot
-ggplotly(p1, tooltip = "text") %>%
+ggplotly(fig1, tooltip = "text") %>%
     # Download plot in svg format and provide default plot name
     config(
         toImageButtonOptions = list(
@@ -243,16 +243,17 @@ ggplotly(p1, tooltip = "text") %>%
 #| title: Read length distribution (comparison)
 
 # Create violin plot of read lengths
-fig1 <- read_lengths_table %>%
+fig2 <- read_lengths_table %>%
     plot_ly(
         x = ~barcode,
-        y = ~ log(read_length),
+        y = ~log(read_length),
         split = ~barcode,
+        meanline = list(visible = TRUE),
         type = "violin"
     )
 
 # Output plot
-fig1 %>%
+fig2 %>%
     # Rename axes
     layout(
         xaxis = list(
@@ -461,7 +462,7 @@ extracted_reads_best_prop <- extracted_reads_best %>%
 #| title: Extracted read sequences per barcode
 
 # Plot sequence counts as fills on each barcode
-p2 <- extracted_reads_best %>%
+fig3 <- extracted_reads_best %>%
     ggplot(
         aes(
         fill = sequence, 
@@ -493,7 +494,7 @@ p2 <- extracted_reads_best %>%
     )
 
 # Customise plot
-p2 <- p2 + labs(x = "Number of sequences", y = "Barcode") +
+fig3 <- fig3 + labs(x = "Number of sequences", y = "Barcode") +
     theme_classic() +
     scale_fill_manual(
         values = c(
@@ -509,7 +510,7 @@ p2 <- p2 + labs(x = "Number of sequences", y = "Barcode") +
     )
 
 # Output plot
-ggplotly(p2, tooltip = "text") %>%
+ggplotly(fig3, tooltip = "text") %>%
     # Download plot in svg format and provide default plot name
     config(
         toImageButtonOptions = list(
@@ -526,7 +527,7 @@ ggplotly(p2, tooltip = "text") %>%
 #| title: Proportion of extracted read sequences per barcode
 
 # Plot proportion of sequences extracted through matchbox
-p3 <- extracted_reads_best_prop %>%
+fig4 <- extracted_reads_best_prop %>%
     ggplot(
         aes(
             y = fct_reorder(barcode, count),
@@ -551,7 +552,7 @@ p3 <- extracted_reads_best_prop %>%
     theme_classic()
 
 # Output plot
-ggplotly(p3, tooltip = "text") %>%
+ggplotly(fig4, tooltip = "text") %>%
     # Download plot in svg format and provide default plot name
     config(
         toImageButtonOptions = list(
@@ -616,7 +617,7 @@ productive_df <- annot_reads_best %>%
     filter(productive == TRUE)
 
 # Plot proportion of productive reads
-p4 <- ggplot(
+fig5 <- ggplot(
     data = productive_df,
     aes(
         x = prop,
@@ -631,7 +632,7 @@ p4 <- ggplot(
     labs(y = "Barcode", x = "Proportion")
 
 # Output plot
-ggplotly(p4, tooltip = "text") %>%
+ggplotly(fig5, tooltip = "text") %>%
     # Download plot in svg format and provide default plot name
     config(
         toImageButtonOptions = list(
