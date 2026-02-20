@@ -28,7 +28,7 @@ library(scales)
 # Aligned reads
 
 ```{r}
-# Read in data
+#| label: ingest-aligned-reads-data
 #| include: false
 
 # Get list of files
@@ -48,6 +48,11 @@ combined_aligned_stats <- rbindlist(data_list, idcol = "barcode", fill = TRUE)
 combined_aligned_stats <- rename(combined_aligned_stats,
     "QC_pass" = V1, "QC_fail" = V2, "category" = V3
 )
+```
+
+``` {r}
+#| label: ingest-sample-sheet-data
+#| include: false
 
 # Read in sample sheet information
 sample_sheet <- read_csv("./data/reference_files/sample_sheet.csv")
@@ -55,7 +60,8 @@ sample_sheet <- sample_sheet %>% select(!report_group)
 ```
 
 ```{r}
-# Parse dataset
+#| label: parse-aligned-data
+#| include: false
 
 # Rename and extract required rows
 rows_required <- list("total", "mapped", "mapped %", "primary", "secondary", "supplementary")
@@ -72,6 +78,9 @@ combined_aligned_stats <- combined_aligned_stats %>%
 ```
 
 ```{r}
+#| label: data-aligned-wide
+#| include: false
+
 # Pivot table
 combined_aligned_stats_wide <- combined_aligned_stats %>%
     pivot_wider(
@@ -91,7 +100,7 @@ combined_aligned_stats_wide <- sample_sheet %>%
 ```
 
 ```{r}
-# Read in data
+#| label: ingest-read-length-data
 #| include: false
 
 # Get list of files
@@ -115,6 +124,8 @@ read_lengths_table <- rename(read_lengths_table,
 
 ## Row {height=120px}
 ```{r}
+#| label: aligned-reads-value-boxes
+
 # Get total samples number
 samples <- combined_aligned_stats_wide %>%
     distinct(sample_name) %>%
@@ -130,6 +141,7 @@ barcodes <- combined_aligned_stats_wide %>%
 # Get total reads number
 total_reads <- sum(combined_aligned_stats_wide$total)
 
+# Set value box background colour
 bg = "#B4ECE7"
 
 # Create value boxes
@@ -163,6 +175,7 @@ layout_column_wrap(
 
 ## Row {.tabset}
 ```{r}
+#| label: aligned-reads-table
 #| title: "Sample alignment results and counts"
 
 datatable(combined_aligned_stats_wide,
@@ -191,8 +204,10 @@ datatable(combined_aligned_stats_wide,
 ```
 
 ```{r}
+#| label: plot-read-length-histogram
 #| title: Read length distribution
 
+# Create histogram of read lengths
 p1 <- ggplot(
     data = read_lengths_table,
     aes(
@@ -213,13 +228,16 @@ p1 <- ggplot(
     theme_classic() +
     theme(panel.grid.major.y = element_line(color = "gray90", linewidth = 0.5))
 
+# Output interactive plot
 ggplotly(p1, tooltip = "text") %>%
+    # Download plot in svg format and provide default plot name
     config(
         toImageButtonOptions = list(
             format = "svg",
             filename = "read_length_distribution"
         )
     ) %>% 
+    # Set plot to auto size
     layout(xaxis = list(autorange = TRUE), yaxis = list(autorange = TRUE))
 
 # p1 <- ggplot(data = read_lengths_table) +
@@ -235,8 +253,10 @@ ggplotly(p1, tooltip = "text") %>%
 ```
 
 ```{r}
+#| label: plot-read-length-violin-plot
 #| title: Read length distribution (comparison)
 
+# Create violin plot of read lengths
 fig1 <- read_lengths_table %>%
     plot_ly(
         x = ~barcode,
@@ -245,7 +265,9 @@ fig1 <- read_lengths_table %>%
         type = "violin"
     )
 
-fig1 <- fig1 %>%
+# Output plot
+fig1 %>%
+    # Rename axes
     layout(
         xaxis = list(
             title = "Barcode"
@@ -254,9 +276,8 @@ fig1 <- fig1 %>%
             title = "Log read length",
             zeroline = F
         )
-    )
-
-fig1 %>%
+    ) %>%
+    # Download plot in svg format and provide default plot name
     config(
         toImageButtonOptions = list(
             format = "svg",
@@ -268,7 +289,7 @@ fig1 %>%
 # Extracted reads
 
 ```{r}
-# Read in data
+#| label: ingest-extracted-reads-data
 #| include: false
 
 # Get list of files
@@ -300,6 +321,8 @@ relocate(sample_name)
 
 ## Row {height=120px}
 ```{r}
+#| label: extracted-reads-value-boxes
+
 # Get total reads
 total_reads <- extracted_reads_best %>%
     filter(sequence == "total reads") %>%
@@ -325,8 +348,10 @@ heavy_kappa_reads <- extracted_reads_best %>%
     filter(sequence == "heavy + kappa") %>%
     summarise(sum(count))
 
+# Sum total light chain + heavy chains found
 heavy_light_reads <- heavy_lambda_reads + heavy_kappa_reads
 
+# Set value box background colour
 bg <- "#B4ECE7"
 
 # Create value boxes
@@ -372,6 +397,7 @@ layout_column_wrap(
 
 ## Row {.tabset}
 ```{r}
+#| label: extracted-reads-table
 #| title: "Extracted reads summary"
 
 # Pivot extracted reads dataset to wide format
@@ -412,13 +438,13 @@ datatable(extracted_reads_best_wide,
 ```
 
 ```{r}
+#| label: plot-extracted-reads-seq-histogram
 #| title: Extracted read sequences per barcode
 
 # Plot sequence counts as fills on each barcode
 p2 <- extracted_reads_best %>%
-
     ggplot(aes(fill = sequence)) + 
-    
+
     geom_col(
         data = extracted_reads_best[(extracted_reads_best[, "sequence"] == "total reads"), ],
         aes(y = fct_reorder(barcode, count), x = count),
@@ -439,6 +465,7 @@ p2 <- extracted_reads_best %>%
         aes(y = fct_reorder(barcode, count), x = count)
     )
 
+# Customise plot
 p2 <- p2 + labs(x = "Number of sequences", y = "Barcode") +
     theme_classic() +
     scale_fill_manual(
@@ -456,16 +483,19 @@ p2 <- p2 + labs(x = "Number of sequences", y = "Barcode") +
 
 # Output plot
 ggplotly(p2) %>%
+    # Download plot in svg format and provide default plot name
     config(
         toImageButtonOptions = list(
             format = "svg",
             filename = "extracted_reads"
         )
     ) %>% 
+    # Set plot to auto size
     layout(xaxis = list(autorange = TRUE), yaxis = list(autorange = TRUE))
 ```
 
 ```{r}
+#| label: plot-extracted-reads-seq-proportion
 #| title: Proportion of extracted read sequences per barcode
 
 # Create new data frame for proportions
@@ -515,20 +545,21 @@ p3 <- extracted_reads_best_prop %>%
 
 # Output plot
 ggplotly(p3) %>%
+    # Download plot in svg format and provide default plot name
     config(
         toImageButtonOptions = list(
             format = "svg",
             filename = "extracted_reads_prop"
         )
     ) %>% 
+    # Set plot to auto size
     layout(xaxis = list(autorange = TRUE), yaxis = list(autorange = TRUE))
 ```
-
 
 # Annotated reads
 
 ```{r}
-# Read in data
+#| label: ingest-annotated-reads-data
 #| include: false
 
 # Get list of files
@@ -555,6 +586,7 @@ relocate(sample_name)
 ```
 
 ```{r}
+#| label: data-productivity
 #| include: false
 
 # Get data on productive reads
@@ -566,6 +598,7 @@ filter(productive == TRUE)
 ```
 
 ```{r}
+#| label: plot-read-productivity
 #| title: Read productivity
 
 # Get data on productive reads
@@ -584,15 +617,13 @@ p4 <- ggplot(data = productive_df, aes(x = prop, y = fct_rev(barcode))) +
 
 # Output plot
 ggplotly(p4) %>%
+    # Download plot in svg format and provide default plot name
     config(
         toImageButtonOptions = list(
             format = "svg",
             filename = "read_productivity"
         )
     ) %>% 
+    # Set plot to auto size
     layout(xaxis = list(autorange = TRUE), yaxis = list(autorange = TRUE))
 ```
-
-<!-- ::: {.card title="My Title"}
-This text will be displayed within a card
-::: -->
