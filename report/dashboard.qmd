@@ -122,7 +122,7 @@ read_lengths_table <- rename(read_lengths_table,
 )
 ```
 
-## Row {height=120px}
+## Row {height=150px}
 ```{r}
 #| label: aligned-reads-value-boxes
 
@@ -306,7 +306,7 @@ left_join(extracted_reads_best, by = join_by(barcode)) %>%
 relocate(sample_name)
 ```
 
-## Row {height=120px}
+## Row {height=150px}
 ```{r}
 #| label: extracted-reads-value-boxes
 
