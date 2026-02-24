@@ -29,13 +29,15 @@ process run_matchbox {
 
     output:
     matchbox_stats: Path = file("${barcode}_count.csv")
-    matchbox_files = tuple(barcode, file("${barcode}_heavy.fasta"), file("${barcode}_light.fasta"))
+    matchbox_files = tuple(barcode, 
+        file("${barcode}_heavy.fasta"), 
+        file("${barcode}_light.fasta", optional: true))
 
     /*
     Run matchbox script, output only heavy and light chain reads, and statistics
     -s  Execute the matchbox script
     -e  Include error tolerance of 0.3 (30%) for insertions, deletions and substitutions
-    -a  Set seqid argument as the sample name, along with target sequences for extraction of light and heavy chains
+    -a  Set seqid argument as the sample name, along with target sequences for extraction of light and heavy chains from matchbox parameter csv file
     --with-reverse-complement   Also process the reverse complement of the reads over the script
     -m  Select the match parameter (all, all-best, one-best)
     */

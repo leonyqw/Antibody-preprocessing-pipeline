@@ -20,13 +20,14 @@ process riot {
 
 	// Declare inputs required for the process
     input:
-    // Tuple for sample name, and paths for heavy chain and light chain files
-	(barcode, heavy_file, light_file): Tuple<String, Path, Path>
+    // Tuple for sample name, and paths for heavy chain and (if antibody) light chain files
+	(barcode, heavy_file, light_file): Tuple<String, Path, Path?>
+    nanobody: Boolean
 	
 	// Declare outputs
 	output:
 	annot_heavy: Path = file("${barcode}_annot_heavy.csv")
-    annot_light: Path = file("${barcode}_annot_light.csv")
+    annot_light: Path = file("${barcode}_annot_light.csv", optional: true)
 
     /*
     Run riot
@@ -36,8 +37,17 @@ process riot {
     -o          Output as annotated files as a csv file
     */
     script:
+    // If only nanobody, run riot on heavy chain
+    if (nanobody) {
+    """
+    riot_na -f ${heavy_file} --species HOMO_SAPIENS -p 16 -o "${barcode}_annot_heavy.csv"
+    """
+    } 
+    // Otheriwse run riot on antibody sequences for heavy and light chain
+    else {
     """
     riot_na -f ${heavy_file} --species HOMO_SAPIENS -p 16 -o "${barcode}_annot_heavy.csv"
     riot_na -f ${light_file} --species HOMO_SAPIENS -p 16 -o "${barcode}_annot_light.csv"
     """
+    }
 }

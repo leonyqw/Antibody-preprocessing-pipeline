@@ -75,9 +75,12 @@ workflow {
 	matchbox_out_best = matchbox2(sample, params.matchbox_script, 
 		params.matchbox_parameters, "all-best", params.nanobody)
 
+
+	// If nanobody, do nanobody riot instead? or can you do dynamic inputs
+
 	// Annotate heavy and light chain sequences
-	riot_out_best = riot(matchbox_out_best.matchbox_files)
-	riot_out_all = riot2(matchbox_out_all.matchbox_files)
+	riot_out_best = riot(matchbox_out_best.matchbox_files, params.nanobody)
+	riot_out_all = riot2(matchbox_out_all.matchbox_files, params.nanobody)
 
 
 	// Publish outputs
