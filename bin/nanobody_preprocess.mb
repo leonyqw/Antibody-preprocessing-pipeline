@@ -1,0 +1,42 @@
+# Matchbox script to rotate the read sequence and output nanobody sequences
+
+# Parameters
+
+# Declare sequences from reference to use to extract nanobody
+# Nanobody before and after sequences
+nanobody_ss = args.nanobody_ss
+nanobody_after = args.nanobody_after
+
+# Assign sample name id
+seqid = args.seqid
+
+# Assign count csv name
+count_name = '{seqid}_count'
+
+# Filter for only reads less than 15000bp long to minimize memory error
+if len(read.seq) < 15000 {
+	
+        # Count total number of reads
+        count!('total reads', name = count_name)
+
+        if read matches [before:_ after:(nanobody_ss _)] => {
+                
+                # Count number of reads that can be rotated
+                count!('rotated', name = count_name)
+
+                # Rearrange nanobody to the start of the read sequence
+                rotated = after.concat(before)
+
+                # Extract nanobody sequence
+                # Identify whether a nanobody sequence exists
+                if rotated matches [_ nanobody:(nanobody_ss _ nanobody_after) _] => {
+
+                        # Count number of nanobody sequences identified
+                        count!('nanobody', name = count_name)
+
+                        # Output nanobody sequences to a file
+                        nanobody.out!('{seqid}_nanobody.fasta')
+                }
+        }
+
+}
