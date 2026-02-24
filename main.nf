@@ -16,6 +16,7 @@ params {
 	matchbox_parameters: Path
 	help: Boolean
 	enable_conda: Boolean
+	nanobody: Boolean
 }
 
 // Import processes or subworkflows to be run in the workflow
@@ -69,10 +70,10 @@ workflow {
 	// Extract heavy and light chain pairs from the reads
 	// Match and output all
 	matchbox_out_all = matchbox(sample, params.matchbox_script, 
-		params.matchbox_parameters, "all")
+		params.matchbox_parameters, "all", params.nanobody)
 	// Match and output only the best match
 	matchbox_out_best = matchbox2(sample, params.matchbox_script, 
-		params.matchbox_parameters, "all-best")
+		params.matchbox_parameters, "all-best", params.nanobody)
 
 	// Annotate heavy and light chain sequences
 	riot_out_best = riot(matchbox_out_best.matchbox_files)

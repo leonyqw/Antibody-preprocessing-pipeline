@@ -12,6 +12,11 @@ LC_after_kappa  = args.LC_after_kappa
 HCss            = args.HCss
 HC_after        = args.HC_after
 
+# Declare sequences from reference to use to extract nanobody
+# Nanobody before and after sequences
+nanobody_ss     = args.nanobody_ss
+nanobody_after  = args.nanobody_after
+
 # Assign sample name id
 seqid = args.seqid
 
