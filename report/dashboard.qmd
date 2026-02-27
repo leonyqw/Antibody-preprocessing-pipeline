@@ -605,6 +605,12 @@ mutate(prop = count/sum(count)) %>%
 filter(productive == TRUE)
 ```
 
+## Row {height=5%}
+::: {.card}
+The read productivity is the proportion of reads that do not contain a stop
+:::
+
+## Row
 ```{r}
 #| label: plot-read-productivity
 #| title: Read productivity
@@ -623,7 +629,8 @@ fig5 <- ggplot(
         x = prop,
         y = fct_rev(barcode),
         text = paste0(
-            "Proportion: ", round(prop, 2)
+            "Proportion: ", round(prop, 2),
+            "<br>Count: ", count
         )
     )
 ) +
