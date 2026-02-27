@@ -40,9 +40,9 @@ process riot {
     // If only nanobody, run riot on heavy chain
     if (nanobody) {
     """
-    riot_na -f ${heavy_file} --species HOMO_SAPIENS -p 16 -o "${barcode}_annot_heavy.csv"
+    riot_na -f ${heavy_file} --species VICUGNA PACOS -p 16 -o "${barcode}_annot_heavy.csv"
     """
-    } 
+    }
     // Otheriwse run riot on antibody sequences for heavy and light chain
     else {
     """
