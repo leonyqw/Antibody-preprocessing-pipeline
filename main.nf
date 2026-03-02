@@ -75,9 +75,6 @@ workflow {
 	matchbox_out_best = matchbox2(sample, params.matchbox_script, 
 		params.matchbox_parameters, "all-best", params.nanobody)
 
-
-	// If nanobody, do nanobody riot instead? or can you do dynamic inputs
-
 	// Annotate heavy and light chain sequences
 	riot_out_best = riot(matchbox_out_best.matchbox_files, params.nanobody)
 	riot_out_all = riot2(matchbox_out_all.matchbox_files, params.nanobody)
@@ -94,10 +91,8 @@ workflow {
 	matchbox_files_best = matchbox_out_best.matchbox_files
 	matchbox_stats_all = matchbox_out_all.matchbox_stats
 	matchbox_files_all = matchbox_out_all.matchbox_files
-	annotated_hc_best = riot_out_best.annot_heavy
-	annotated_lc_best = riot_out_best.annot_light
-	annotated_hc_all = riot_out_all.annot_heavy
-	annotated_lc_all = riot_out_all.annot_light
+	annotated_files_best = riot_out_best.riot_files
+	annotated_files_all = riot_out_all.riot_files
 
 	// Completion message
 	onComplete:
@@ -150,16 +145,10 @@ output {
 	matchbox_files_all {
 		path "3_extracted_reads/all/fasta_files"
 	}
-	annotated_hc_best {
+	annotated_files_best {
 		path "4_annotated_reads/best"
 	}
-	annotated_lc_best {
-		path "4_annotated_reads/best"
-	}
-	annotated_hc_all {
+	annotated_files_all {
 		path "4_annotated_reads/all"
-	}
-	annotated_lc_all {
-		path "4_annotated_reads/best"
 	}
 }

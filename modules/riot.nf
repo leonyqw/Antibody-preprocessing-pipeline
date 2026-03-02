@@ -26,8 +26,9 @@ process riot {
 	
 	// Declare outputs
 	output:
-	annot_heavy: Path = file("${barcode}_annot_heavy.csv")
-    annot_light: Path = file("${barcode}_annot_light.csv", optional: true)
+    riot_files = tuple(
+        file("${barcode}_annot_heavy.csv"), 
+        file("${barcode}_annot_light.csv", optional: true))
 
     /*
     Run riot

@@ -7,6 +7,7 @@ nextflow.preview.types = true
 
 process samtools {
 	tag "${barcode}"
+	label "process_high"
 
 	// Enable conda and install samtools if conda profile is set
 	conda (params.enable_conda ? 'bioconda::samtools=1.22.1' : null)
