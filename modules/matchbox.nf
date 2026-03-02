@@ -17,22 +17,27 @@ process run_matchbox {
     // Tuple for sample name, and path for DNA sequence fastq files
 	(barcode, read_file): Tuple<String, Path>
     matchbox_script: Path // Path to matchbox script
-    LCss: String //Light chain signal sequence
-    LC_after_lambda: String //Lambda light chain constant region sequence
-    LC_after_kappa: String //Kappa light chain constant region sequence
-    HCss: String //Heavy chain signal sequence
-    HC_after: String //Sequence directly after variable heavy chain sequence
+    LCss: String // Light chain signal sequence
+    LC_after_lambda: String // Lambda light chain constant region sequence
+    LC_after_kappa: String // Kappa light chain constant region sequence
+    HCss: String // Heavy chain signal sequence
+    HC_after: String // Sequence directly after variable heavy chain sequence
+    nanobody_ss: String // Nanobody signal sequence
+    nanobody_after: String // Sequence directly after nanobody sequence
     match_param: String // Matchbox script matching argument
+    nanobody: Boolean // Matchbox parameter for extracting nanobody instead of antibody sequences
 
     output:
     matchbox_stats: Path = file("${barcode}_count.csv")
-    matchbox_files = tuple(barcode, file("${barcode}_heavy.fasta"), file("${barcode}_light.fasta"))
+    matchbox_files = tuple(barcode, 
+        file("${barcode}_heavy.fasta"), 
+        file("${barcode}_light.fasta", optional: true))
 
     /*
     Run matchbox script, output only heavy and light chain reads, and statistics
     -s  Execute the matchbox script
     -e  Include error tolerance of 0.3 (30%) for insertions, deletions and substitutions
-    -a  Set seqid argument as the sample name, along with target sequences for extraction of light and heavy chains
+    -a  Set seqid argument as the sample name, along with target sequences for extraction of light and heavy chains from matchbox parameter csv file
     --with-reverse-complement   Also process the reverse complement of the reads over the script
     -m  Select the match parameter (all, all-best, one-best)
     */
@@ -40,7 +45,7 @@ process run_matchbox {
     """
 	matchbox \\
     -s ${matchbox_script} -e 0.3 \\
-    -a "seqid='${barcode}', LCss = ${LCss}, LC_after_lambda = ${LC_after_lambda}, LC_after_kappa = ${LC_after_kappa}, HCss = ${HCss}, HC_after = ${HC_after}" \\
+    -a "seqid='${barcode}', LCss = ${LCss}, LC_after_lambda = ${LC_after_lambda}, LC_after_kappa = ${LC_after_kappa}, HCss = ${HCss}, HC_after = ${HC_after}, nanobody_ss = ${nanobody_ss}, nanobody_after = ${nanobody_after}, nanobody = ${nanobody}" \\
     --with-reverse-complement \\
     -m ${match_param}\\
     ${read_file}
@@ -55,6 +60,7 @@ workflow matchbox {
     matchbox_script: Path // Path to matchbox script
     matchbox_parameters: Path // Path to matchbox parameters
     match_param: String // Matchbox script matching argument
+    nanobody: Boolean // True or false flag for nanobody extraction
 
     main:
     // Parse parameters file
@@ -65,7 +71,8 @@ workflow matchbox {
     // Run matchbox process
     matchbox_out = run_matchbox(files, matchbox_script, 
     parameters.LCss, parameters.LC_after_lambda, parameters.LC_after_kappa, 
-    parameters.HCss, parameters.HC_after, match_param)
+    parameters.HCss, parameters.HC_after, parameters.nanobody_ss, parameters.nanobody_after, 
+    match_param, nanobody)
 
 	// Declare outputs
 	emit:
