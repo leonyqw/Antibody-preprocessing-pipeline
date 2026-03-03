@@ -29,11 +29,13 @@ process minimap2 {
 	Run minimap, mapping reads to a reference and outputs a sam file
 	-a			Generates CIGAR and outputs alignments in sam format
 	-x map-ont	Sets preset for ONT alignment
+	-t 8		Use 8 threads
 	-o			Output alignments to sam file
 	*/
     script:
     """
 	minimap2 \\
+	-t 8 \\
 	-ax map-ont \\
 	${reference} \\
 	${read_file} \\

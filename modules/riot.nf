@@ -8,7 +8,7 @@ nextflow.preview.types = true
 
 process riot {
 	tag "${barcode}"
-    label "process_high"
+    label "process_extreme"
 
     // Enable conda and install riot if conda profile is set
 	conda (params.enable_conda ? 'bioconda::riot-na=4.0.2' : null)
