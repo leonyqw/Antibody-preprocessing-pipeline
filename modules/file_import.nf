@@ -11,7 +11,11 @@ process concat_reads {
     tag "${barcode}"
 
     input:
-    (barcode, files): Tuple<String, List<Path>> // Tuple for sample barcode, and list of files with the barcode
+    // Record for sample barcode, and list of files with the barcode
+    record(
+        barcode: String, 
+        files: List<Path>
+    )
 
     // Output sample: tuple containing barcode and merged file
     output:
