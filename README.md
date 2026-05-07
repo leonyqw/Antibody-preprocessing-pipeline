@@ -1,4 +1,4 @@
-# Antibody preprocessing pipeline
+# AbPreP - Antibody preprocessing pipeline
 This nextflow pipeline is designed to assist in processing of antibody long-read sequences. This will align and annotate heavy and light chains from long reads, and provide QC metrics.
 
 ## Useful links
