@@ -6,6 +6,7 @@ Utilize minimap2 to align Oxford Nanopore DNA read sequences contained in fastq 
 nextflow.preview.types = true
 
 process minimap2 {
+	
 	tag "${barcode}"
 	label "process_high"
 

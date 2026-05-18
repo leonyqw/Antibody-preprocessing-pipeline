@@ -20,10 +20,10 @@ params {
 }
 
 // Import processes or subworkflows to be run in the workflow
-include { header                } from './modules/header'
+include { header                } from './subworkflows/header'
+include { helpMessage           } from './subworkflows/help'
 include { validate_params       } from './modules/validate_params'
 include { parse_sample_sheet    } from './modules/file_import'
-include { helpMessage           } from './modules/help'
 include { minimap2              } from './modules/minimap2'
 include { samtools              } from './modules/samtools'
 include { matchbox              } from './modules/matchbox'
