@@ -1,6 +1,6 @@
-# leonyqw/abprep2: Documentation
+# AbPreP: Documentation
 
-The leonyqw/abprep2 documentation is split into the following pages:
+The AbPreP documentation is split into the following pages:
 
 - [Usage](usage.md)
   - An overview of how the pipeline works, how to run it and a description of all of the different command-line flags.
