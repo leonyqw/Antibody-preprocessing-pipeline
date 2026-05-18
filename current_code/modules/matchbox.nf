@@ -3,7 +3,7 @@ Utilize matchbox to extract only the variable heavy and light chains.
 */
 
 //Enable typed processes
-nextflow.preview.types = true
+nextflow.enable.types = true
 
 process run_matchbox {
 	tag "${barcode}"

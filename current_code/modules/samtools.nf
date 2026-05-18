@@ -3,7 +3,7 @@ Utilize samtools to write SAM file to BAM file.
 */
 
 //Enable typed processes
-nextflow.preview.types = true
+nextflow.enable.types = true
 
 process samtools {
 	tag "${barcode}"

@@ -3,7 +3,7 @@ Import samples using a sample sheet
 */
 
 // Enable typed processes
-nextflow.preview.types = true
+nextflow.enable.types = true
 
 // ADAPTED FROM https://stackoverflow.com/questions/74039553/nextflow-rename-barcodes-and-concatenate-reads-within-barcodes
 

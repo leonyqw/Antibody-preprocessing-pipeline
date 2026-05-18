@@ -14,8 +14,8 @@
 */
 
 include { ABPREP  } from './workflows/abprep2'
-include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_abprep2_pipeline'
-include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_abprep2_pipeline'
+include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_abprep_pipeline'
+include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_abprep_pipeline'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOWS FOR PIPELINE
@@ -25,7 +25,7 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_abpr
 //
 // WORKFLOW: Run main analysis pipeline depending on type of input
 //
-workflow LEONYQW_ABPREP2 {
+workflow ABPREP {
 
     take:
     samplesheet // channel: samplesheet read in from --input
@@ -35,7 +35,7 @@ workflow LEONYQW_ABPREP2 {
     //
     // WORKFLOW: Run pipeline
     //
-    ABPREP2 (
+    ABPREP (
         samplesheet,
         params.multiqc_config,
         params.multiqc_logo,
@@ -43,7 +43,7 @@ workflow LEONYQW_ABPREP2 {
         params.outdir,
     )
     emit:
-    multiqc_report = ABPREP2.out.multiqc_report // channel: /path/to/multiqc_report.html
+    multiqc_report = ABPREP.out.multiqc_report // channel: /path/to/multiqc_report.html
 }
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -72,7 +72,7 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    LEONYQW_ABPREP2 (
+    ABPREP (
         PIPELINE_INITIALISATION.out.samplesheet
     )
     //

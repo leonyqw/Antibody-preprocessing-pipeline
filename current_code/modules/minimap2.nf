@@ -3,7 +3,12 @@ Utilize minimap2 to align Oxford Nanopore DNA read sequences contained in fastq 
 */
 
 //Enable typed processes
-nextflow.preview.types = true
+nextflow.enable.types = true
+
+// record Sample {
+//     barcode: String
+//     read_file: Path
+//     }
 
 process minimap2 {
 	
@@ -19,7 +24,13 @@ process minimap2 {
     'community.wave.seqera.io/library/minimap2:2.30--dde6b0c5fbc82ebd' }"
 
     input:
-	(barcode, read_file): Tuple<String, Path> // Tuple for sample name, and path for DNA sequence fastq files
+	// (barcode, read_file): Tuple<String, Path> 
+	// Tuple for sample name, and path for DNA sequence fastq files
+	record (
+        barcode: String, 
+        read_file: Path
+    )
+	// sample : Sample
 	reference: Path // Path for reference genome
 	
 	// Output tuple with sample name and sam file

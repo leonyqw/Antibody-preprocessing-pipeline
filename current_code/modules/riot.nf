@@ -4,7 +4,7 @@ E.g. provides information on sequence and germline alignment, V(D)J & C sequence
 */
 
 //Enable typed processes
-nextflow.preview.types = true
+nextflow.enable.types = true
 
 process riot {
 	tag "${barcode}"

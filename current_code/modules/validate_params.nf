@@ -3,7 +3,7 @@ Validate parameters are valid paths.
 */
 
 //Enable typed processes
-nextflow.preview.types = true
+nextflow.enable.types = true
 
 process validate_params {
 
