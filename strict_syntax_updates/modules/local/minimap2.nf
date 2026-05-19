@@ -5,12 +5,7 @@ Utilize minimap2 to align Oxford Nanopore DNA read sequences contained in fastq 
 //Enable typed processes
 nextflow.enable.types = true
 
-// record Sample {
-//     barcode: String
-//     read_file: Path
-//     }
-
-process minimap2 {
+process MINIMAP2 {
 	
 	tag "${barcode}"
 	label "process_high"
@@ -25,17 +20,21 @@ process minimap2 {
 
     input:
 	// (barcode, read_file): Tuple<String, Path> 
-	// Tuple for sample name, and path for DNA sequence fastq files
-	record (
-        barcode: String, 
-        read_file: Path
-    )
-	// sample : Sample
+	// Record for sample name, and path for DNA sequence fastq files
+	// sample: Sample
+	record(
+        barcode: String,
+        file: Path
+	)
 	reference: Path // Path for reference genome
 	
 	// Output tuple with sample name and sam file
 	output:
-	minimap_out = tuple(barcode, file("${barcode}_aligned.sam"))
+	// minimap_out = tuple(barcode, file("${barcode}_aligned.sam"))
+	minimap_out = record(
+					barcode: barcode, 
+					file: file("${barcode}_aligned.sam")
+				)
 
 	/*
 	Run minimap, mapping reads to a reference and outputs a sam file
@@ -50,7 +49,12 @@ process minimap2 {
 	-t 8 \\
 	-ax map-ont \\
 	${reference} \\
-	${read_file} \\
+	${file} \\
 	-o "${barcode}_aligned.sam"
     """
 }
+
+// record Sample {
+//         barcode: String
+//         file: Path
+// }

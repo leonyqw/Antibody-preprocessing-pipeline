@@ -2,10 +2,16 @@
 Utilize matchbox to extract only the variable heavy and light chains.
 */
 
-//Enable typed processes
+// Enable typed processes
 nextflow.enable.types = true
 
-process run_matchbox {
+// Declare record type for the incoming file
+record File {
+    barcode: String
+    file: Path
+    }
+
+process RUN_MATCHBOX {
 	tag "${barcode}"
     label "process_high"
 
@@ -14,8 +20,11 @@ process run_matchbox {
 
 	// Declare inputs required for the process
     input:
-    // Tuple for sample name, and path for DNA sequence fastq files
-	(barcode, read_file): Tuple<String, Path>
+    // Record for sample name, and path for DNA sequence fastq files
+	record (
+        barcode: String, 
+        file: Path
+    )
     matchbox_script: Path // Path to matchbox script
     LCss: String // Light chain signal sequence
     LC_after_lambda: String // Lambda light chain constant region sequence
@@ -28,10 +37,16 @@ process run_matchbox {
     nanobody: Boolean // Matchbox parameter for extracting nanobody instead of antibody sequences
 
     output:
-    matchbox_stats: Path = file("${barcode}_count.csv")
-    matchbox_files = tuple(barcode, 
-        file("${barcode}_heavy.fasta"), 
-        file("${barcode}_light.fasta", optional: true))
+    record(
+        barcode: String, 
+        matchbox_stats: file("${barcode}_count.csv"), 
+        heavy_chain: file("${barcode}_heavy.fasta"), 
+        light_chain: file("${barcode}_light.fasta", optional: true)
+    )
+    // matchbox_stats: Path = file("${barcode}_count.csv")
+    // matchbox_files = tuple(barcode, 
+    //     file("${barcode}_heavy.fasta"), 
+    //     file("${barcode}_light.fasta", optional: true))
 
     /*
     Run matchbox script, output only heavy and light chain reads, and statistics
@@ -48,15 +63,16 @@ process run_matchbox {
     -a "seqid='${barcode}', LCss = ${LCss}, LC_after_lambda = ${LC_after_lambda}, LC_after_kappa = ${LC_after_kappa}, HCss = ${HCss}, HC_after = ${HC_after}, nanobody_ss = ${nanobody_ss}, nanobody_after = ${nanobody_after}, nanobody = ${nanobody}" \\
     --with-reverse-complement \\
     -m ${match_param}\\
-    ${read_file}
+    ${file}
     """
 }
 
-workflow matchbox {
+workflow MATCHBOX {
 
 	// Declare inputs required for the process
     take:
-    files: Tuple<String, Path> // Tuple for sample name, and path for DNA sequence fastq files
+    // files = Tuple<String, Path> // Tuple for sample name, and path for DNA sequence fastq files
+    file: Channel<File>
     matchbox_script: Path // Path to matchbox script
     matchbox_parameters: Path // Path to matchbox parameters
     match_param: String // Matchbox script matching argument
@@ -69,13 +85,12 @@ workflow matchbox {
     .collectEntries { row -> [(row.Parameter): row.Value] }
 
     // Run matchbox process
-    matchbox_out = run_matchbox(files, matchbox_script, 
+    matchbox_out = RUN_MATCHBOX(file, matchbox_script, 
     parameters.LCss, parameters.LC_after_lambda, parameters.LC_after_kappa, 
     parameters.HCss, parameters.HC_after, parameters.nanobody_ss, parameters.nanobody_after, 
     match_param, nanobody)
 
 	// Declare outputs
 	emit:
-	matchbox_stats = matchbox_out.matchbox_stats
-    matchbox_files = matchbox_out.matchbox_files
+	matchbox_out = matchbox_out
 }

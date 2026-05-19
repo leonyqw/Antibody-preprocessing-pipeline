@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 //Enable typed processes
-nextflow.preview.types = true
+nextflow.enable.types = true
 
 // Print help message information
 workflow helpMessage {
@@ -29,7 +29,7 @@ Optional Arguments:
 			  Options - [standard, wehi, conda, singularity, local] (default: standard)
 """.stripIndent()
     
-    exit 1
+    exit(1,"")
     }
 }
 

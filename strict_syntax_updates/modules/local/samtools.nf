@@ -5,7 +5,7 @@ Utilize samtools to write SAM file to BAM file.
 //Enable typed processes
 nextflow.enable.types = true
 
-process samtools {
+process SAMTOOLS {
 	tag "${barcode}"
 	label "process_high"
 
@@ -18,11 +18,22 @@ process samtools {
     'community.wave.seqera.io/library/samtools:1.22.1--eccb42ff8fb55509' }"
 
     input:
-	// Tuple for sample name, and path for aligned reads after minimap2
-	(barcode, aligned_read_file): Tuple<String, Path> 
+	// Record for sample name, and path for aligned reads after minimap2
+	// (barcode, aligned_read_file): Tuple<String, Path> 
+	record(
+		barcode: String, 
+		file: Path
+	)
 	
 	// Output aligned reads, bam index file, and aligned QC statistics
 	output:
+	// record(
+	// 	barcode: barcode, 
+	// 	aligned_sorted_read: file("${barcode}_aligned_sorted.bam"), 
+	// 	index: file("${barcode}_aligned_sorted.bam.bai"), 
+	// 	aligned_stats: file("${barcode}_alignment_stats.tsv"), 
+	// 	read_lengths: file("${barcode}_read_lengths.tsv")
+	// )
 	aligned_sorted_read: Path = file("${barcode}_aligned_sorted.bam")
 	index: Path = file("${barcode}_aligned_sorted.bam.bai")
 	aligned_stats: Path = file("${barcode}_alignment_stats.tsv")
@@ -31,7 +42,7 @@ process samtools {
     script:
     """
 	# View and convert file from SAM to BAM format. Sort alignments and outputs the file in BAM format
-	samtools view -b "${aligned_read_file}" | samtools sort -o "${barcode}_aligned_sorted.bam"
+	samtools view -b "${file}" | samtools sort -o "${barcode}_aligned_sorted.bam"
 	
 	# Index BAM file for fast random access
 	samtools index "${barcode}_aligned_sorted.bam"

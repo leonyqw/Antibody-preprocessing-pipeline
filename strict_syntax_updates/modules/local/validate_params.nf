@@ -5,7 +5,7 @@ Validate parameters are valid paths.
 //Enable typed processes
 nextflow.enable.types = true
 
-process validate_params {
+process VALIDATE_PARAMS {
 
     input:
     paths_to_validate: String

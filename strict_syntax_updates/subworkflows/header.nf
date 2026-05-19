@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 //Enable typed processes
-nextflow.preview.types = true
+nextflow.enable.types = true
 
 // Print pipeline information
 workflow header {
