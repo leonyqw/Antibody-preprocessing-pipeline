@@ -67,7 +67,7 @@ workflow PARSE_SAMPLE_SHEET {
     sample
 }
 
-record Sample {
-        barcode: String
-        file: Path
-}
+// record Sample {
+//         barcode: String
+//         file: Path
+// }

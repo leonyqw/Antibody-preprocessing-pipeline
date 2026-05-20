@@ -72,6 +72,7 @@ workflow {
         "all",
         params.nanobody,
     )
+
     // Match and output only the best match
     matchbox_out_best = MATCHBOX_BEST(
         sample,
@@ -81,22 +82,22 @@ workflow {
         params.nanobody,
     )
 
-    // // Annotate heavy and light chain sequences
-    // riot_out_best = RIOT_BEST(matchbox_out_best.matchbox_files, params.nanobody)
-    // riot_out_all = RIOT_ALL(matchbox_out_all.matchbox_files, params.nanobody)
+    // Annotate heavy and light chain sequences
+    riot_out_best = RIOT_BEST(matchbox_out_best, params.nanobody)
+    riot_out_all = RIOT_ALL(matchbox_out_all, params.nanobody)
 
-    // publish:
-    // barcode_file         = sample
-    // bam_file             = sam_out.aligned_sorted_read
-    // bam_index            = sam_out.index
-    // aligned_stats        = sam_out.aligned_stats
-    // read_lengths         = sam_out.read_lengths
+    publish:
+    barcode_file         = sample
+    bam_file             = sam_out.aligned_sorted_read
+    bam_index            = sam_out.index
+    aligned_stats        = sam_out.aligned_stats
+    read_lengths         = sam_out.read_lengths
     // matchbox_stats_best  = matchbox_out_best.matchbox_stats
     // matchbox_files_best  = matchbox_out_best.matchbox_files
     // matchbox_stats_all   = matchbox_out_all.matchbox_stats
     // matchbox_files_all   = matchbox_out_all.matchbox_files
-    // annotated_files_best = riot_out_best.riot_files
-    // annotated_files_all  = riot_out_all.riot_files
+    annotated_files_best = riot_out_best
+    annotated_files_all  = riot_out_all
 
     onComplete:
     log.info(
@@ -121,38 +122,38 @@ workflow {
 }
 
 // Set output paths
-// output {
-//     barcode_file {
-//         path "1_combined_reads"
-//     }
-//     bam_file {
-//         path "2_aligned_reads/bam_files"
-//     }
-//     bam_index {
-//         path "2_aligned_reads/bam_files"
-//     }
-//     aligned_stats {
-//         path "2_aligned_reads/stats"
-//     }
-//     read_lengths {
-//         path "2_aligned_reads/read_lengths"
-//     }
-//     matchbox_stats_best {
-//         path "3_extracted_reads/best/counts"
-//     }
-//     matchbox_files_best {
-//         path "3_extracted_reads/best/fasta_files"
-//     }
-//     matchbox_stats_all {
-//         path "3_extracted_reads/all/counts"
-//     }
-//     matchbox_files_all {
-//         path "3_extracted_reads/all/fasta_files"
-//     }
-//     annotated_files_best {
-//         path "4_annotated_reads/best"
-//     }
-//     annotated_files_all {
-//         path "4_annotated_reads/all"
-//     }
-// }
+output {
+    barcode_file {
+        path "1_combined_reads"
+    }
+    bam_file {
+        path "2_aligned_reads/bam_files"
+    }
+    bam_index {
+        path "2_aligned_reads/bam_files"
+    }
+    aligned_stats {
+        path "2_aligned_reads/stats"
+    }
+    read_lengths {
+        path "2_aligned_reads/read_lengths"
+    }
+    // matchbox_stats_best {
+    //     path "3_extracted_reads/best/counts"
+    // }
+    // matchbox_files_best {
+    //     path "3_extracted_reads/best/fasta_files"
+    // }
+    // matchbox_stats_all {
+    //     path "3_extracted_reads/all/counts"
+    // }
+    // matchbox_files_all {
+    //     path "3_extracted_reads/all/fasta_files"
+    // }
+    annotated_files_best {
+        path "4_annotated_reads/best"
+    }
+    annotated_files_all {
+        path "4_annotated_reads/all"
+    }
+}

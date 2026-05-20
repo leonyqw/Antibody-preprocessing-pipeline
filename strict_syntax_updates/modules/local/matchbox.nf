@@ -5,11 +5,11 @@ Utilize matchbox to extract only the variable heavy and light chains.
 // Enable typed processes
 nextflow.enable.types = true
 
-// Declare record type for the incoming file
-record File {
+// Create record type for sample
+record Sample {
     barcode: String
     file: Path
-    }
+}
 
 process RUN_MATCHBOX {
 	tag "${barcode}"
@@ -38,7 +38,7 @@ process RUN_MATCHBOX {
 
     output:
     record(
-        barcode: String, 
+        barcode: barcode, 
         matchbox_stats: file("${barcode}_count.csv"), 
         heavy_chain: file("${barcode}_heavy.fasta"), 
         light_chain: file("${barcode}_light.fasta", optional: true)
@@ -72,7 +72,7 @@ workflow MATCHBOX {
 	// Declare inputs required for the process
     take:
     // files = Tuple<String, Path> // Tuple for sample name, and path for DNA sequence fastq files
-    file: Channel<File>
+    sample: Sample
     matchbox_script: Path // Path to matchbox script
     matchbox_parameters: Path // Path to matchbox parameters
     match_param: String // Matchbox script matching argument
@@ -85,12 +85,12 @@ workflow MATCHBOX {
     .collectEntries { row -> [(row.Parameter): row.Value] }
 
     // Run matchbox process
-    matchbox_out = RUN_MATCHBOX(file, matchbox_script, 
+    matchbox_out = RUN_MATCHBOX(sample, matchbox_script, 
     parameters.LCss, parameters.LC_after_lambda, parameters.LC_after_kappa, 
     parameters.HCss, parameters.HC_after, parameters.nanobody_ss, parameters.nanobody_after, 
     match_param, nanobody)
 
 	// Declare outputs
 	emit:
-	matchbox_out = matchbox_out
+	matchbox_out
 }

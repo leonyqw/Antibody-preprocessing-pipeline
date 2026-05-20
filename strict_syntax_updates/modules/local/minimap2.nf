@@ -21,7 +21,6 @@ process MINIMAP2 {
     input:
 	// (barcode, read_file): Tuple<String, Path> 
 	// Record for sample name, and path for DNA sequence fastq files
-	// sample: Sample
 	record(
         barcode: String,
         file: Path
