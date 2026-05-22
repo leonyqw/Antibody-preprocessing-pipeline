@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com///nextflow_schema.json",
   "title": "AbPreP pipeline parameters",
-  "description": "Preprocessing of antibody sequence data",
+  "description": "AbPreP: Antibody Preprocessing Pipeline",
   "type": "object",
   "$defs": {
     "input_output_options": {
@@ -14,6 +14,7 @@
         "read_dir": {
           "type": "string",
           "description": "Path to file or directory of sequence reads",
+          "exists": true,
           "help_text": "Accepts a file or directory where files are of fastq, fq, fastq.gz, or fq.gz format",
           "fa_icon": "fas fa-folder-open",
           "format": "path"
@@ -21,6 +22,7 @@
         "sample_sheet": {
           "type": "string",
           "description": "Sample sheet for pipeline input",
+          "exists": true,
           "fa_icon": "fas fa-table",
           "pattern": "^\\S+\\.csv$",
           "format": "file-path"
@@ -46,6 +48,7 @@
           "type": "string",
           "description": "Location of the phagemid reference genome in fa format",
           "format": "file-path",
+          "exists": true,
           "pattern": "^\\S+\\.fa$",
           "fa_icon": "fas fa-file"
         }
@@ -63,6 +66,7 @@
           "type": "string",
           "description": "Path to the matchbox script file",
           "format": "file-path",
+          "exists": true,
           "fa_icon": "fas fa-file-code",
           "pattern": "^\\S+\\.mb$"
         },
@@ -70,6 +74,7 @@
           "type": "string",
           "description": "Path to the matchbox parameters file",
           "fa_icon": "fas fa-file-alt",
+          "exists": true,
           "pattern": "^\\S+\\.csv$",
           "format": "file-path"
         }
@@ -85,7 +90,6 @@
       "properties": {
         "nanobody": {
           "type": "boolean",
-          "default": false,
           "description": "Extract nanobody sequences instead of antibody sequences",
           "help_text": "Set to true to extract nanobody sequences instead of antibody sequences. Default is false.",
           "fa_icon": "fas fa-check"
@@ -101,7 +105,6 @@
       "properties": {
         "enable_conda": {
           "type": "boolean",
-          "default": false,
           "description": "Option to use conda environment instead of docker/singularity containers",
           "help_text": "Set to true to use a conda environment instead of docker/singularity containers. Default is false.",
           "fa_icon": "fas fa-check"
