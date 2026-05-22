@@ -132,36 +132,36 @@ workflow {
 // Set output paths
 output {
     barcode_file {
-        path "1_combined_reads"
+        path "combined_reads"
     }
     bam_file {
-        path "2_aligned_reads/bam_files"
+        path "samtools/bam_files"
     }
     bam_index {
-        path "2_aligned_reads/bam_files"
+        path "samtools/bam_files"
     }
     aligned_stats {
-        path "2_aligned_reads/stats"
+        path "samtools/stats"
     }
     read_lengths {
-        path "2_aligned_reads/read_lengths"
+        path "samtools/read_lengths"
     }
     matchbox_stats_best {
-        path "3_extracted_reads/best/counts"
+        path "matchbox/best/counts"
     }
     matchbox_files_best {
-        path "3_extracted_reads/best/fasta_files"
+        path "matchbox/best/fasta_files"
     }
     matchbox_stats_all {
-        path "3_extracted_reads/all/counts"
+        path "matchbox/all/counts"
     }
     matchbox_files_all {
-        path "3_extracted_reads/all/fasta_files"
+        path "matchbox/all/fasta_files"
     }
     annotated_files_best {
-        path "4_annotated_reads/best"
+        path "riot/best"
     }
     annotated_files_all {
-        path "4_annotated_reads/all"
+        path "riot/all"
     }
 }
