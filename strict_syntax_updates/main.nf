@@ -6,8 +6,9 @@ nextflow.enable.types = true
 // Import processes or subworkflows to be run in the workflow
 include { header                    } from './subworkflows/header'
 include { helpMessage               } from './subworkflows/help'
+include { validateParameters; paramsSummaryLog; samplesheetToList } from 'plugin/nf-schema'
 // include { ABPREP       } from './workflows/abprep'
-include { VALIDATE_PARAMS           } from './modules/local/validate_params'
+// include { VALIDATE_PARAMS           } from './modules/local/validate_params'
 include { PARSE_SAMPLE_SHEET        } from './modules/local/file_import'
 include { MINIMAP2                  } from './modules/local/minimap2'
 include { SAMTOOLS                  } from './modules/local/samtools'
@@ -53,7 +54,16 @@ workflow {
 
     // Validate parameters
     paths_to_validate = [params.read_dir, params.phagemid_ref, params.matchbox_script, params.matchbox_parameters].join(",")
-    VALIDATE_PARAMS(paths_to_validate)
+    // VALIDATE_PARAMS(paths_to_validate)
+
+    // Validate input parameters
+    validateParameters()
+
+    // Print summary of supplied parameters
+    log.info paramsSummaryLog(workflow)
+
+    // Create a new channel of metadata from a sample sheet passed to the pipeline through the --input parameter
+    // ch_input = Channel.fromList(samplesheetToList(params.input, "assets/schema_input.json"))
 
     sample = PARSE_SAMPLE_SHEET(params.read_dir, params.sample_sheet)
 
@@ -83,8 +93,8 @@ workflow {
     )
 
     // Annotate heavy and light chain sequences
-    riot_out_best = RIOT_BEST(matchbox_out_best, params.nanobody)
-    riot_out_all = RIOT_ALL(matchbox_out_all, params.nanobody)
+    riot_out_best = RIOT_BEST(matchbox_out_best)
+    riot_out_all = RIOT_ALL(matchbox_out_all)
 
     publish:
     barcode_file         = sample
