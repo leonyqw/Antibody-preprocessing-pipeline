@@ -30,7 +30,7 @@ process RIOT {
 	
 	// Declare outputs
 	output:
-    riot_files = tuple(
+    tuple(
         file("${barcode}_annot_heavy.csv"), 
         file("${barcode}_annot_light.csv", optional: true)
     )

@@ -11,6 +11,13 @@ record Sample {
     file: Path
 }
 
+record Matchbox_Output {
+    barcode: String
+    matchbox_stats: Path
+    heavy_chain: Path
+    light_chain: Path?
+}
+
 process RUN_MATCHBOX {
 	tag "${barcode}"
     label "process_high"
@@ -92,5 +99,6 @@ workflow MATCHBOX {
 
 	// Declare outputs
 	emit:
-	matchbox_out
+	// matchbox_out: Channel<Matchbox_Output> = matchbox_out
+    matchbox_out
 }

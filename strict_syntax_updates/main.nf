@@ -92,10 +92,18 @@ workflow {
     bam_index            = sam_out.index
     aligned_stats        = sam_out.aligned_stats
     read_lengths         = sam_out.read_lengths
-    // matchbox_stats_best  = matchbox_out_best.matchbox_stats
-    // matchbox_files_best  = matchbox_out_best.matchbox_files
-    // matchbox_stats_all   = matchbox_out_all.matchbox_stats
-    // matchbox_files_all   = matchbox_out_all.matchbox_files
+    matchbox_stats_best  = matchbox_out_best.map { output ->
+        output.matchbox_stats
+    }
+    matchbox_files_best  = matchbox_out_best.map { output ->
+        tuple(output.heavy_chain, output.light_chain)
+    }
+    matchbox_stats_all   = matchbox_out_all.map { output ->
+        output.matchbox_stats
+    }
+    matchbox_files_all   = matchbox_out_all.map { output ->
+        tuple(output.heavy_chain, output.light_chain)
+    }
     annotated_files_best = riot_out_best
     annotated_files_all  = riot_out_all
 
@@ -138,18 +146,18 @@ output {
     read_lengths {
         path "2_aligned_reads/read_lengths"
     }
-    // matchbox_stats_best {
-    //     path "3_extracted_reads/best/counts"
-    // }
-    // matchbox_files_best {
-    //     path "3_extracted_reads/best/fasta_files"
-    // }
-    // matchbox_stats_all {
-    //     path "3_extracted_reads/all/counts"
-    // }
-    // matchbox_files_all {
-    //     path "3_extracted_reads/all/fasta_files"
-    // }
+    matchbox_stats_best {
+        path "3_extracted_reads/best/counts"
+    }
+    matchbox_files_best {
+        path "3_extracted_reads/best/fasta_files"
+    }
+    matchbox_stats_all {
+        path "3_extracted_reads/all/counts"
+    }
+    matchbox_files_all {
+        path "3_extracted_reads/all/fasta_files"
+    }
     annotated_files_best {
         path "4_annotated_reads/best"
     }
