@@ -26,7 +26,6 @@ process RIOT {
         heavy_chain: Path, 
         light_chain: Path?
     )
-    nanobody: Boolean
 	
 	// Declare outputs
 	output:
@@ -44,7 +43,7 @@ process RIOT {
     */
     script:
     // If only nanobody, run riot on heavy chain
-    if (nanobody) {
+    if (params.nanobody) {
     """
     riot_na -f ${heavy_chain} --species VICUGNA_PACOS -p 16 -o "${barcode}_annot_heavy.csv"
     """
