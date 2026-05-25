@@ -8,18 +8,18 @@ nextflow.enable.types = true
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { header                    } from './subworkflows/header'
-include { helpMessage               } from './subworkflows/help'
-include { validateParameters; paramsSummaryLog; samplesheetToList } from 'plugin/nf-schema'
-include { ABPREP       } from './workflows/abprep'
+include { header             } from './subworkflows/header'
+include { helpMessage        } from './subworkflows/help'
+include { validateParameters ; paramsSummaryLog ; samplesheetToList } from 'plugin/nf-schema'
+include { ABPREP             } from './workflows/abprep'
 // include { VALIDATE_PARAMS           } from './modules/local/validate_params'
-include { PARSE_SAMPLE_SHEET        } from './modules/local/file_import'
-include { MINIMAP2                  } from './modules/local/minimap2'
-include { SAMTOOLS                  } from './modules/local/samtools'
-include { MATCHBOX as MATCHBOX_ALL  } from './modules/local/matchbox'
-include { RIOT as RIOT_ALL          } from './modules/local/riot'
-include { MATCHBOX as MATCHBOX_BEST } from './modules/local/matchbox'
-include { RIOT as RIOT_BEST         } from './modules/local/riot'
+// include { PARSE_SAMPLE_SHEET        } from './modules/local/file_import'
+// include { MINIMAP2                  } from './modules/local/minimap2'
+// include { SAMTOOLS                  } from './modules/local/samtools'
+// include { MATCHBOX as MATCHBOX_ALL  } from './modules/local/matchbox'
+// include { RIOT as RIOT_ALL          } from './modules/local/riot'
+// include { MATCHBOX as MATCHBOX_BEST } from './modules/local/matchbox'
+// include { RIOT as RIOT_BEST         } from './modules/local/riot'
 
 // Pipeline parameters
 params {
@@ -61,10 +61,10 @@ workflow {
     validateParameters()
 
     // Print summary of supplied parameters
-    log.info paramsSummaryLog(workflow)
+    log.info(paramsSummaryLog(workflow))
 
     // Create a new channel of metadata from a sample sheet passed to the pipeline through the --input parameter
-    // ch_input = Channel.fromList(samplesheetToList(params.input, "assets/schema_input.json"))
+    // ch_input = Channel.fromList(samplesheetToList(params.sample_sheet, "assets/schema_input.json"))
 
     // Run AbPreP workflow
     abprep = ABPREP(
@@ -73,21 +73,21 @@ workflow {
         params.phagemid_ref,
         params.matchbox_script,
         params.matchbox_parameters,
-        params.nanobody
+        params.nanobody,
     )
 
     publish:
-    barcode_file         = abprep.barcode_file
-    bam_file             = abprep.bam_file
-    bam_index            = abprep.bam_index
-    aligned_stats        = abprep.aligned_stats
-    read_lengths         = abprep.read_lengths
-    matchbox_stats_best  = abprep.matchbox_stats_best
-    matchbox_files_best  = abprep.matchbox_files_best
-    matchbox_stats_all   = abprep.matchbox_stats_all
-    matchbox_files_all   = abprep.matchbox_files_all
-    riot_files_best = abprep.riot_files_best
-    riot_files_all  = abprep.riot_files_all
+    barcode_file        = abprep.barcode_file
+    bam_file            = abprep.bam_file
+    bam_index           = abprep.bam_index
+    aligned_stats       = abprep.aligned_stats
+    read_lengths        = abprep.read_lengths
+    matchbox_stats_best = abprep.matchbox_stats_best
+    matchbox_files_best = abprep.matchbox_files_best
+    matchbox_stats_all  = abprep.matchbox_stats_all
+    matchbox_files_all  = abprep.matchbox_files_all
+    riot_files_best     = abprep.riot_files_best
+    riot_files_all      = abprep.riot_files_all
 
     onComplete:
     log.info(
