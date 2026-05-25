@@ -8,7 +8,7 @@ workflow header {
 
 log.info """
 =======================================================================================
-QC preprocessing pipeline
+AbPreP: Antibody Preprocessing Pipeline
 =======================================================================================
 
 Created by Leon Wang

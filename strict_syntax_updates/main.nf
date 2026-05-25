@@ -99,7 +99,6 @@ workflow {
 	Completed at	: ${workflow.complete}
 	Duration	: ${workflow.duration}
 	Success		: ${workflow.success}
-	Work directory	: ${workflow.workDir}
 	Exit status	: ${workflow.exitStatus}
 
 	=====================================================================================
