@@ -19,11 +19,11 @@ sample1,xx,xx
 ```
 nextflow run main.nf \
 	-profile <conda/singularity/.../institute>
-	-params-file
-	--read_dir [path to fastq files] \
-	--sample_sheet [path to sample sheet] \
-	--phagemid_ref [path to reference genome] \
-	--matchbox_script [path to matchbox script]
+	-params-file <path to parameter file>
+	--read_dir <path to fastq files> \
+	--sample_sheet <path to sample sheet> \
+	--phagemid_ref <path to reference genome> \
+	--matchbox_script <path to matchbox script>
 ```
 
 Parameters
