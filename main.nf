@@ -89,23 +89,20 @@ workflow {
     riot_files_all      = abprep.riot_files_all
 
     onComplete:
-    log.info(
-        """
-	=====================================================================================
-	Workflow execution summary
-	=====================================================================================
+    def status = workflow.success ? "SUCCESS ✅" : "FAILED ❌"
 
-	Completed at	: ${workflow.complete}
-	Duration	: ${workflow.duration}
-	Success		: ${workflow.success}
-	Exit status	: ${workflow.exitStatus}
-
-	=====================================================================================
-	""".stripIndent()
-    )
+    println "\n"
+    println "============================================================================"
+    println "Pipeline execution summary"
+    println "============================================================================"
+    println "Completed at       : ${workflow.complete}"
+    println "Duration           : ${workflow.duration}"
+    println "Pipeline finished  : ${status}"
+    println "exit status        : ${workflow.exitStatus}"
+    println ""
 
     onError:
-    log.error("Error: Pipeline execution stopped with the following message: ${workflow.errorMessage}".stripIndent())
+    println "Error: Pipeline execution stopped with the following message: ${workflow.errorMessage}".stripIndent()
 }
 
 // Set output paths
