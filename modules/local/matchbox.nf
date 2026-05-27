@@ -33,13 +33,14 @@ process RUN_MATCHBOX {
         file: Path
     )
     matchbox_script: Path // Path to matchbox script
-    LCss: String // Light chain signal sequence
-    LC_after_lambda: String // Lambda light chain constant region sequence
-    LC_after_kappa: String // Kappa light chain constant region sequence
-    HCss: String // Heavy chain signal sequence
-    HC_after: String // Sequence directly after variable heavy chain sequence
-    nanobody_ss: String // Nanobody signal sequence
-    nanobody_after: String // Sequence directly after nanobody sequence
+    matchbox_parameters: Map // Map of parameters for matchbox script
+    // LCss: String // Light chain signal sequence
+    // LC_after_lambda: String // Lambda light chain constant region sequence
+    // LC_after_kappa: String // Kappa light chain constant region sequence
+    // HCss: String // Heavy chain signal sequence
+    // HC_after: String // Sequence directly after variable heavy chain sequence
+    // nanobody_ss: String // Nanobody signal sequence
+    // nanobody_after: String // Sequence directly after nanobody sequence
     match_param: String // Matchbox script matching argument
     nanobody: Boolean // Matchbox parameter for extracting nanobody instead of antibody sequences
 
@@ -67,9 +68,9 @@ process RUN_MATCHBOX {
     """
 	matchbox \\
     -s ${matchbox_script} -e 0.3 \\
-    -a "seqid='${barcode}', LCss = ${LCss}, LC_after_lambda = ${LC_after_lambda}, LC_after_kappa = ${LC_after_kappa}, HCss = ${HCss}, HC_after = ${HC_after}, nanobody_ss = ${nanobody_ss}, nanobody_after = ${nanobody_after}, nanobody = ${nanobody}" \\
+    -a "seqid='${barcode}', LCss = ${matchbox_parameters.LCss}, LC_after_lambda = ${matchbox_parameters.LC_after_lambda}, LC_after_kappa = ${matchbox_parameters.LC_after_kappa}, HCss = ${matchbox_parameters.HCss}, HC_after = ${matchbox_parameters.HC_after}, nanobody_ss = ${matchbox_parameters.nanobody_ss}, nanobody_after = ${matchbox_parameters.nanobody_after}, nanobody = ${nanobody}" \\
     --with-reverse-complement \\
-    -m ${match_param}\\
+    -m ${match_param} \\
     ${file}
     """
 }
@@ -91,11 +92,16 @@ workflow MATCHBOX {
     .splitCsv( header: true )
     .collectEntries { row -> [(row.Parameter): row.Value] }
 
+    // param = channel.fromPath("${matchbox_parameters}")
+    // .flatMap { csv -> csv.splitCsv(header: true, sep: ',') }
+    // .map { row -> [(row.Parameter): row.Value] }
+    // .reduce { 
+    //     param1, param2 -> param1 + param2
+    // }
+    // .view()
+
     // Run matchbox process
-    matchbox_out = RUN_MATCHBOX(sample, matchbox_script, 
-    parameters.LCss, parameters.LC_after_lambda, parameters.LC_after_kappa, 
-    parameters.HCss, parameters.HC_after, parameters.nanobody_ss, parameters.nanobody_after, 
-    match_param, nanobody)
+    matchbox_out = RUN_MATCHBOX(sample, matchbox_script, parameters, match_param, nanobody)
 
 	// Declare outputs
 	emit:
