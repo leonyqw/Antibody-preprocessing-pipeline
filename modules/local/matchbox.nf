@@ -73,6 +73,13 @@ process RUN_MATCHBOX {
     -m ${match_param} \\
     ${file}
     """
+
+    stub:
+    """
+    touch ${barcode}_count.csv
+    touch ${barcode}_heavy.fasta
+    touch ${barcode}_light.fasta
+    """
 }
 
 workflow MATCHBOX {

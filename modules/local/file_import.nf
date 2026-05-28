@@ -33,6 +33,11 @@ process CONCAT_READS {
     """
     zcat -f ${files.join(' ')} > "${barcode}_merged.fastq"
     """
+
+    stub:
+    """
+    touch ${barcode}_merged.fastq
+    """
 }
 
 workflow PARSE_SAMPLE_SHEET {

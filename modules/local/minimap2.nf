@@ -51,6 +51,11 @@ process MINIMAP2 {
 	${file} \\
 	-o "${barcode}_aligned.sam"
     """
+
+	stub:
+	"""
+	touch ${barcode}_aligned.sam
+	"""
 }
 
 // record Sample {

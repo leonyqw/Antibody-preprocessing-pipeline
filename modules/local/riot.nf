@@ -55,4 +55,10 @@ process RIOT {
     riot_na -f ${light_chain} --species HOMO_SAPIENS -p 16 -o "${barcode}_annot_light.csv"
     """
     }
+
+    stub:
+    """
+    touch ${barcode}_annot_heavy.csv
+    touch ${barcode}_annot_light.csv
+    """
 }

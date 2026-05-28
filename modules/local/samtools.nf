@@ -53,4 +53,12 @@ process SAMTOOLS {
 	# Output read lengths as a text file
 	samtools view "${barcode}_aligned_sorted.bam" | awk '{print length(\$10)}' > ${barcode}_read_lengths.tsv
     """
+
+	stub:
+	"""
+	touch ${barcode}_aligned_sorted.bam
+	touch ${barcode}_aligned_sorted.bam.bai
+	touch ${barcode}_alignment_stats.tsv
+	touch ${barcode}_read_lengths.tsv
+	"""
 }
