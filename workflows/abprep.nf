@@ -29,10 +29,10 @@ workflow ABPREP {
 
     main:
 
-    sample = PARSE_SAMPLE_SHEET(read_dir, sample_sheet)
+    ch_sample = PARSE_SAMPLE_SHEET(read_dir, sample_sheet)
 
     // QC: Identify % aligning to the reference (gDNA/helper phage contamination)
-    minimap_out = MINIMAP2(sample, phagemid_ref)
+    minimap_out = MINIMAP2(ch_sample, phagemid_ref)
 
     // Convert and index the SAM file format to BAM file format
     sam_out = SAMTOOLS(minimap_out)
@@ -40,7 +40,7 @@ workflow ABPREP {
     // Extract heavy and light chain pairs from the reads
     // Match and output all
     matchbox_out_all = MATCHBOX_ALL(
-        sample,
+        ch_sample,
         matchbox_script,
         matchbox_parameters,
         "all",
@@ -49,7 +49,7 @@ workflow ABPREP {
 
     // Match and output only the best match
     matchbox_out_best = MATCHBOX_BEST(
-        sample,
+        ch_sample,
         matchbox_script,
         matchbox_parameters,
         "all-best",
@@ -61,7 +61,7 @@ workflow ABPREP {
     riot_out_all = RIOT_ALL(matchbox_out_all)
 
     emit:
-    barcode_file         = sample
+    barcode_file         = ch_sample
     bam_file             = sam_out.aligned_sorted_read
     bam_index            = sam_out.index
     aligned_stats        = sam_out.aligned_stats
