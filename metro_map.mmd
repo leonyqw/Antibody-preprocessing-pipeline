@@ -2,7 +2,7 @@
 %%metro style: nfcore
 
 %% metro fold_threshold: 4
-%%metro x_spacing: 121
+%% metro x_spacing: 121
 %%metro diamond_style: symmetric
 
 %% metro label_angle: 
@@ -21,7 +21,7 @@
 %%metro files: counts_csv | CSV | Counts\nmatrix
 %%metro files: annotated_csv | CSV | Annotated\nsequences
 
-%%metro off_track: indexed_sam, counts_csv, annotated_csv, matchbox_script
+%%metro off_track: indexed_sam, counts_csv, annotated_csv, matchbox_script, samplesheet
 
 %%metro grid: inputs | 0,0
 %%metro grid: alignment | 1,1
@@ -35,11 +35,11 @@ graph LR
         %% nodes
 		samplesheet[ ]
 		samples[ ]
-        input_branch[]
+        _input_branch[]
         
         %% edges
-        samplesheet --> |main, qc| input_branch
-        samples --> |main, qc| input_branch
+        samplesheet --> |main, qc| _input_branch
+        samples --> |main, qc| _input_branch
         %% reference --> |qc| input_branch
     end
 
@@ -111,10 +111,12 @@ graph LR
        
         
 %% Inter-section edges - inputs
-input_branch -->|main| matchbox
-input_branch -->|qc| minimap2
+_input_branch -->|main| matchbox
+_input_branch -->|qc| minimap2
 
 
 %% Inter-section edges - join into QC
 samtools -->|qc| qcreport
 _extract_end_node -->|qc| qcreport
+
+%% Inter-section edges - outputs
